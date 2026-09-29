@@ -1,0 +1,330 @@
+/* ==========================================================
+   ADX – Aplicativo de Xadrez | Frontend da Aplicação Web
+   Folha de estilos principal
+   ========================================================== */
+
+/* ---------- Fontes (arquivos locais, funcionam offline) ---------- */
+@font-face { font-family: "Barlow"; font-weight: 400; font-style: normal; font-display: swap;
+  src: url("../fonts/barlow-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 500; font-style: normal; font-display: swap;
+  src: url("../fonts/barlow-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 600; font-style: normal; font-display: swap;
+  src: url("../fonts/barlow-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 700; font-style: normal; font-display: swap;
+  src: url("../fonts/barlow-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 600; font-style: normal; font-display: swap;
+  src: url("../fonts/barlow-semi-condensed-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Semi Condensed"; font-weight: 700; font-style: normal; font-display: swap;
+  src: url("../fonts/barlow-semi-condensed-latin-700-normal.woff2") format("woff2"); }
+
+/* ---------- Tokens ---------- */
+:root {
+  --nogueira: #33241A;        /* madeira escura: barra superior, títulos */
+  --nogueira-2: #4B3627;
+  --ouro: #D4A017;            /* ação principal (mesma cor do app mobile) */
+  --ouro-escuro: #B3860C;
+  --ouro-claro: #FBF3DC;
+  --casa-clara: #EAD7B4;      /* casas do tabuleiro */
+  --casa-escura: #A06E45;
+  --fundo: #F4F4F2;
+  --superficie: #FFFFFF;
+  --linha: #DEDBD4;
+  --linha-forte: #C9C4BA;
+  --texto: #2B2622;
+  --texto-suave: #6B635B;
+
+  --vitoria: #2E7D32;  --vitoria-texto: #1E6B24; --vitoria-bg: #E5F1E6;
+  --empate:  #E07A00;  --empate-texto:  #8F4C00; --empate-bg:  #FBEEDB;
+  --derrota: #C62828;  --derrota-texto: #A61F1F; --derrota-bg: #F8E2E2;
+
+  --fonte-texto: "Barlow", "Segoe UI", Roboto, Arial, sans-serif;
+  --fonte-titulo: "Barlow Semi Condensed", "Barlow", "Segoe UI", Arial, sans-serif;
+  --fonte-pecas: "Segoe UI Symbol", "DejaVu Sans", "Noto Sans Symbols 2", serif;
+
+  --raio-campo: 6px;
+  --raio-painel: 10px;
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--fonte-texto);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--texto);
+  background: var(--fundo);
+}
+h1, h2, h3 { font-family: var(--fonte-titulo); color: var(--nogueira); line-height: 1.15; margin: 0; }
+h1 { font-size: 34px; font-weight: 700; }
+h2 { font-size: 22px; font-weight: 700; }
+h3 { font-size: 18px; font-weight: 600; }
+p { margin: 0; }
+a { color: var(--nogueira); text-underline-offset: 3px; }
+a:hover { color: var(--ouro-escuro); }
+:focus-visible { outline: 3px solid var(--ouro); outline-offset: 2px; }
+.numero { font-variant-numeric: tabular-nums; }
+.suave { color: var(--texto-suave); }
+.oculto-visual { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Barra superior ---------- */
+.topo {
+  background: var(--nogueira);
+  color: var(--casa-clara);
+}
+.topo-interno {
+  max-width: 1180px; margin: 0 auto; padding: 0 32px;
+  height: 64px; display: flex; align-items: center; gap: 36px;
+}
+.marca {
+  display: flex; align-items: center; gap: 10px;
+  color: #FFFFFF; text-decoration: none;
+  font-family: var(--fonte-titulo); font-weight: 700; font-size: 26px; letter-spacing: 0.02em;
+}
+.marca:hover { color: #FFFFFF; }
+.marca-peca { font-family: var(--fonte-pecas); color: var(--ouro); font-size: 28px; line-height: 1; }
+.menu { display: flex; gap: 4px; flex: 1; }
+.menu a {
+  color: var(--casa-clara); text-decoration: none; font-weight: 500;
+  padding: 20px 12px 18px; border-bottom: 3px solid transparent;
+}
+.menu a:hover { color: #FFFFFF; }
+.menu a[aria-current="page"] { color: #FFFFFF; border-bottom-color: var(--ouro); }
+.usuario { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+.avatar {
+  display: inline-grid; place-items: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--ouro); color: var(--nogueira);
+  font-weight: 700; font-size: 14px;
+}
+.usuario a { color: var(--casa-clara); }
+.usuario a:hover { color: #FFFFFF; }
+
+/* ---------- Conteúdo ---------- */
+.conteudo { max-width: 1180px; margin: 0 auto; padding: 32px 32px 56px; }
+.cabecalho-pagina {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+  margin-bottom: 24px;
+}
+.cabecalho-pagina p { margin-top: 6px; color: var(--texto-suave); }
+.voltar { display: inline-block; margin-bottom: 8px; font-weight: 500; }
+
+.painel {
+  background: var(--superficie);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-painel);
+  padding: 24px;
+}
+.painel-titulo { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
+.painel-titulo a { font-weight: 500; font-size: 15px; }
+
+.grade { display: grid; gap: 24px; }
+.grade-2-1 { grid-template-columns: 2fr 1fr; }
+.grade-form { grid-template-columns: minmax(0, 640px) minmax(0, 1fr); align-items: start; }
+.pilha { display: grid; gap: 24px; align-content: start; }
+
+/* ---------- Botões ---------- */
+.botao {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 46px; padding: 0 22px;
+  border-radius: var(--raio-campo); border: 1.5px solid transparent;
+  font: 700 16px var(--fonte-texto);
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+}
+.botao-primario { background: var(--ouro); color: var(--nogueira); }
+.botao-primario:hover { background: var(--ouro-escuro); color: var(--nogueira); }
+.botao-secundario { background: transparent; color: var(--nogueira); border-color: var(--nogueira); }
+.botao-secundario:hover { background: var(--nogueira); color: #FFFFFF; }
+.botao-largo { width: 100%; }
+.acoes { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+
+/* ---------- Formulários ---------- */
+.campo { display: grid; gap: 6px; margin-bottom: 18px; }
+.campo label, .campo legend { font-weight: 600; font-size: 15px; color: var(--nogueira); padding: 0; }
+.campo input, .campo select, .campo textarea {
+  width: 100%; min-height: 46px; padding: 10px 14px;
+  font: 400 16px var(--fonte-texto); color: var(--texto);
+  background: #FFFFFF; border: 1.5px solid var(--linha-forte); border-radius: var(--raio-campo);
+}
+.campo textarea { min-height: 96px; resize: vertical; }
+.campo input:focus, .campo select:focus, .campo textarea:focus {
+  outline: none; border-color: var(--nogueira); box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.35);
+}
+.campo input[readonly] { background: var(--fundo); color: var(--texto-suave); }
+.campo .ajuda { font-size: 14px; color: var(--texto-suave); }
+.campo .erro { font-size: 14px; color: var(--derrota-texto); font-weight: 600; display: none; }
+.campo.invalido input, .campo.invalido select { border-color: var(--derrota); }
+.campo.invalido .erro { display: block; }
+.campo-senha { position: relative; }
+.campo-senha input { padding-right: 88px; }
+.mostrar-senha {
+  position: absolute; right: 6px; top: 6px; height: 34px; padding: 0 12px;
+  border: 0; background: transparent; color: var(--nogueira);
+  font: 600 14px var(--fonte-texto); cursor: pointer; border-radius: 4px;
+}
+fieldset.campo { border: 0; margin: 0 0 18px; padding: 0; min-width: 0; }
+
+/* seletor em botões (modo de jogo / resultado) */
+.opcoes { display: flex; gap: 10px; flex-wrap: wrap; }
+.opcao { position: relative; }
+.opcao input { position: absolute; top: 0; left: 0; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.opcao span {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 46px; padding: 0 20px;
+  border: 1.5px solid var(--linha-forte); border-radius: var(--raio-campo);
+  background: #FFFFFF; font-weight: 600; cursor: pointer;
+}
+.opcao input:focus-visible + span { outline: 3px solid var(--ouro); outline-offset: 2px; }
+.opcao input:checked + span { border-color: var(--nogueira); background: var(--nogueira); color: #FFFFFF; }
+.opcao-vitoria input:checked + span { background: var(--vitoria); border-color: var(--vitoria); }
+.opcao-empate  input:checked + span { background: var(--empate);  border-color: var(--empate); }
+.opcao-derrota input:checked + span { background: var(--derrota); border-color: var(--derrota); }
+
+.aviso {
+  display: flex; gap: 10px; padding: 12px 14px; margin: 4px 0 18px;
+  background: var(--ouro-claro); border-left: 4px solid var(--ouro); border-radius: 4px;
+  font-size: 15px;
+}
+.mensagem {
+  display: none; padding: 12px 14px; margin-bottom: 18px; border-radius: 4px; font-weight: 600;
+}
+.mensagem.visivel { display: block; }
+.mensagem.sucesso { background: var(--vitoria-bg); color: var(--vitoria-texto); }
+.mensagem.falha { background: var(--derrota-bg); color: var(--derrota-texto); }
+
+/* ---------- Resultado (sempre texto + cor) ---------- */
+.resultado {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 3px 10px; border-radius: 4px; font-weight: 600; font-size: 15px;
+}
+.resultado::before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: currentColor; }
+.resultado.vitoria { background: var(--vitoria-bg); color: var(--vitoria-texto); }
+.resultado.empate  { background: var(--empate-bg);  color: var(--empate-texto); }
+.resultado.derrota { background: var(--derrota-bg); color: var(--derrota-texto); }
+
+/* ---------- Tabela estilo planilha de partidas ---------- */
+.tabela-rolagem { overflow-x: auto; }
+.planilha { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.planilha th {
+  text-align: left; font-weight: 600; font-size: 14px; color: var(--texto-suave);
+  padding: 10px 14px; border-bottom: 2px solid var(--nogueira);
+}
+.planilha td { padding: 11px 14px; border-bottom: 1px solid var(--linha); }
+.planilha tbody tr:hover { background: #FAF9F7; }
+.planilha .col-num { width: 64px; color: var(--texto-suave); }
+.planilha .col-acao { text-align: right; }
+.planilha .col-dir { text-align: right; }
+.planilha tr.destaque { background: var(--ouro-claro); }
+.planilha tr.destaque td:first-child { box-shadow: inset 4px 0 0 var(--ouro); }
+.vazio { padding: 28px 14px; text-align: center; color: var(--texto-suave); }
+
+.filtros { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 8px; }
+.filtros .campo { margin-bottom: 12px; }
+.paginacao { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+.paginacao .acoes { margin-top: 0; }
+.paginacao .botao { height: 40px; padding: 0 16px; }
+.paginacao .botao[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- Desempenho ---------- */
+.placar { display: grid; grid-template-columns: repeat(4, 1fr); margin-bottom: 18px; }
+.placar div { padding: 0 16px; border-left: 1px solid var(--linha); }
+.placar div:first-child { padding-left: 0; border-left: 0; }
+.placar strong { display: block; font-family: var(--fonte-titulo); font-size: 40px; line-height: 1.05; color: var(--nogueira); }
+.placar span { font-size: 15px; color: var(--texto-suave); }
+.placar .v strong { color: var(--vitoria-texto); }
+.placar .e strong { color: var(--empate-texto); }
+.placar .d strong { color: var(--derrota-texto); }
+
+.barra-desempenho { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--linha); }
+.barra-desempenho i { display: block; height: 100%; }
+.barra-desempenho .v { background: var(--vitoria); }
+.barra-desempenho .e { background: var(--empate); }
+.barra-desempenho .d { background: var(--derrota); }
+.barra-fina { height: 8px; }
+.legenda-barra { display: flex; justify-content: space-between; margin-top: 10px; font-size: 15px; }
+
+.modos { display: grid; gap: 18px; }
+.modo-linha .modo-topo { display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 600; }
+.modo-linha .modo-topo span { font-weight: 400; color: var(--texto-suave); font-size: 15px; }
+
+.posicao { font-family: var(--fonte-titulo); font-size: 56px; font-weight: 700; color: var(--nogueira); line-height: 1; }
+.posicao small { font-size: 22px; }
+
+/* ---------- Detalhes da partida ---------- */
+.confronto { display: flex; align-items: center; gap: 18px; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--linha); }
+.confronto .resultado { font-size: 18px; padding: 6px 14px; }
+.confronto h2 { font-size: 28px; }
+.dados { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px 32px; margin: 0; }
+.dados dt { font-size: 14px; color: var(--texto-suave); }
+.dados dd { margin: 2px 0 0; font-size: 18px; font-weight: 600; color: var(--nogueira); }
+.lista-simples { list-style: none; margin: 16px 0 0; padding: 0; }
+.lista-simples li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--linha); }
+
+/* ---------- Perfil ---------- */
+.foto-perfil { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+.avatar-grande {
+  display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%;
+  background: var(--ouro); color: var(--nogueira); font-family: var(--fonte-titulo); font-size: 34px; font-weight: 700;
+}
+.foto-perfil .botao { height: 40px; padding: 0 16px; }
+.painel p + .acoes { margin-top: 14px; }
+.valor-destaque { font-size: 17px; font-weight: 600; color: var(--nogueira); margin-bottom: 4px; }
+
+/* ---------- Telas de acesso (login e cadastro) ---------- */
+.acesso { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+.acesso-tabuleiro {
+  background: var(--nogueira); color: var(--casa-clara);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  padding: 32px;
+}
+.acesso-marca { text-align: center; }
+.acesso-marca strong { display: block; font-family: var(--fonte-titulo); font-size: 64px; line-height: 1; color: #FFFFFF; letter-spacing: 0.04em; }
+.acesso-marca span { font-size: 18px; }
+.tabuleiro-moldura { display: grid; grid-template-columns: 18px auto; grid-template-rows: auto 18px; gap: 6px; }
+.tabuleiro {
+  display: grid; grid-template-columns: repeat(8, 58px); grid-template-rows: repeat(8, 58px);
+  border: 6px solid var(--nogueira-2);
+}
+.casa { display: grid; place-items: center; background: var(--casa-clara); }
+.casa.escura { background: var(--casa-escura); }
+.peca { font-family: var(--fonte-pecas); font-size: 40px; line-height: 1; }
+.peca.branca { color: #FFFFFF; text-shadow: 0 0 1px #1E1512, 0 0 1px #1E1512, 0 1px 1px #1E1512; }
+.peca.preta { color: #1E1512; }
+.coord-linhas { display: grid; grid-template-rows: repeat(8, 58px); align-items: center; font-size: 13px; padding-top: 6px; }
+.coord-colunas { grid-column: 2; display: grid; grid-template-columns: repeat(8, 58px); justify-items: center; font-size: 13px; padding-left: 6px; }
+.lance { font-size: 15px; text-align: center; max-width: 480px; }
+.lance em { font-style: normal; color: #FFFFFF; font-weight: 600; }
+
+.acesso-form { display: flex; align-items: center; justify-content: center; padding: 48px 32px; background: var(--superficie); }
+.acesso-form .formulario { width: 100%; max-width: 400px; }
+.acesso-form h1 { margin-bottom: 6px; }
+.acesso-form .subtitulo { color: var(--texto-suave); margin-bottom: 28px; }
+.linha-link { display: flex; justify-content: flex-end; margin: -8px 0 18px; font-size: 15px; }
+.rodape-form { margin-top: 22px; text-align: center; color: var(--texto-suave); }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 960px) {
+  .grade-2-1, .grade-form { grid-template-columns: 1fr; }
+  .filtros { grid-template-columns: 1fr; }
+  .acesso { grid-template-columns: 1fr; }
+  .acesso-tabuleiro { display: none; }
+  .topo-interno { height: auto; flex-wrap: wrap; gap: 8px 24px; padding: 12px 20px; }
+  .menu { order: 3; width: 100%; overflow-x: auto; }
+  .menu a { padding: 10px 10px 8px; }
+  .conteudo { padding: 24px 20px 40px; }
+  .cabecalho-pagina { flex-direction: column; align-items: flex-start; }
+  .placar { grid-template-columns: repeat(2, 1fr); gap: 16px 0; }
+  .placar div:nth-child(3) { padding-left: 0; border-left: 0; }
+  .dados { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ---------- Espaçamentos auxiliares ---------- */
+.espaco-topo { margin-top: 24px; }
+.espaco-pequeno { margin-top: 12px; }
+.planilha .col-pos { width: 96px; color: var(--texto-suave); }
+.painel > h2 + .mensagem.visivel { margin-top: 12px; margin-bottom: 0; }
+.legenda-foto { margin-top: 6px; font-size: 14px; color: var(--texto-suave); }
