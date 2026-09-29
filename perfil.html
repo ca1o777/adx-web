@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meu perfil | ADX – Aplicativo de Xadrez</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-tela="perfil">
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="painel.html"><span class="marca-peca" aria-hidden="true">&#9822;&#xFE0E;</span>ADX</a>
+      <nav class="menu" aria-label="Menu principal"><a href="painel.html">Painel</a><a href="registrar-partida.html">Registrar partida</a><a href="historico.html">Histórico</a><a href="ranking.html">Ranking</a><a href="perfil.html" aria-current="page">Meu perfil</a></nav>
+      <div class="usuario"><span class="avatar" aria-hidden="true">CF</span><span>Caio Fernandes</span><a href="index.html">Sair</a></div>
+    </div>
+  </header>
+  <main class="conteudo">
+    <div class="cabecalho-pagina">
+      <div><h1>Meu perfil</h1><p>Atualize como você aparece para os outros jogadores.</p></div>
+    </div>
+    <div class="grade grade-2-1">
+      <section class="painel">
+        <div class="painel-titulo"><h2>Dados do perfil</h2></div>
+        <div class="mensagem" id="mensagem-perfil" role="status" aria-live="polite"></div>
+        <div class="foto-perfil">
+          <div class="avatar-grande" aria-hidden="true">CF</div>
+          <div><button class="botao botao-secundario" type="button">Alterar foto</button><p class="legenda-foto">JPG ou PNG com até 2 MB.</p></div>
+        </div>
+        <form id="form-perfil" novalidate>
+          <div class="campo"><label for="nome-exibicao">Nome de exibição</label><input id="nome-exibicao" type="text" required><span class="ajuda">É assim que você aparece no ranking.</span><span class="erro"></span></div>
+          <div class="campo"><label for="nome-completo">Nome completo</label><input id="nome-completo" type="text" readonly><span class="ajuda">Informado no cadastro.</span></div>
+          <div class="campo"><label for="modo-preferido">Modo de jogo preferido</label>
+            <select id="modo-preferido"><option>Clássico</option><option>Rápido</option><option>Blitz</option></select></div>
+          <div class="campo"><label for="sobre">Sobre você</label><textarea id="sobre" placeholder="Opcional. Conte há quanto tempo joga ou qual abertura prefere."></textarea></div>
+          <div class="acoes"><button class="botao botao-primario" type="submit">Salvar alterações</button></div>
+        </form>
+      </section>
+      <div class="pilha">
+        <section class="painel">
+          <h2>E-mail de acesso</h2>
+          <div class="mensagem" id="mensagem-email" role="status" aria-live="polite"></div>
+          <p class="valor-destaque espaco-pequeno" id="email-atual"></p>
+          <p class="suave">Para alterar, enviamos um código de confirmação ao e-mail atual.</p>
+          <div class="acoes"><button class="botao botao-secundario" id="alterar-email" type="button">Alterar e-mail</button></div>
+        </section>
+        <section class="painel">
+          <h2>Senha</h2>
+          <div class="mensagem" id="mensagem-senha" role="status" aria-live="polite"></div>
+          <p class="suave espaco-pequeno">Enviamos um link de redefinição para o e-mail cadastrado.</p>
+          <div class="acoes"><button class="botao botao-secundario" id="redefinir-senha" type="button">Redefinir senha</button></div>
+        </section>
+        <section class="painel">
+          <h2>Excluir conta</h2>
+          <p class="suave espaco-pequeno">A exclusão da conta é feita pelo suporte do ADX, a pedido do jogador.</p>
+          <div class="acoes"><a class="botao botao-secundario" href="mailto:suporte@adx.exemplo.com">Falar com o suporte</a></div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="assets/js/dados.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

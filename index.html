@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar | ADX – Aplicativo de Xadrez</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-tela="login">
+  <main class="acesso">
+    <section class="acesso-tabuleiro" aria-hidden="true">
+      <div class="acesso-marca"><strong>ADX</strong><span>Aplicativo de Xadrez</span></div>
+      <div class="tabuleiro-moldura">
+        <div class="coord-linhas"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div>
+        <div class="tabuleiro"><div class="casa"><span class="peca preta">&#9820;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"><span class="peca preta">&#9821;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9819;&#xFE0E;</span></div><div class="casa"><span class="peca preta">&#9818;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9821;&#xFE0E;</span></div><div class="casa"><span class="peca preta">&#9822;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9820;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa"></div><div class="casa escura"></div><div class="casa"><span class="peca preta">&#9822;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa escura"></div><div class="casa"><span class="peca branca">&#9821;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa"></div><div class="casa escura"></div><div class="casa"></div><div class="casa"></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa"><span class="peca branca">&#9822;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"></div><div class="casa"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa"></div><div class="casa escura"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9820;&#xFE0E;</span></div><div class="casa"><span class="peca branca">&#9822;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9821;&#xFE0E;</span></div><div class="casa"><span class="peca branca">&#9819;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9818;&#xFE0E;</span></div><div class="casa"></div><div class="casa escura"></div><div class="casa"><span class="peca branca">&#9820;&#xFE0E;</span></div></div>
+        <div class="coord-colunas"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+      </div>
+      <p class="lance">Abertura Ruy López: <em>1. e4 e5 2. Cf3 Cc6 3. Bb5</em></p>
+      <p class="lance">Registre suas partidas, acompanhe seu desempenho e dispute o ranking.</p>
+    </section>
+    <section class="acesso-form">
+      <div class="formulario">
+        <h1>Entrar</h1>
+        <p class="subtitulo">Acesse com o e-mail e a senha cadastrados.</p>
+        <div class="mensagem" id="mensagem" role="status" aria-live="polite"></div>
+        <form id="form-login" novalidate>
+          <div class="campo">
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="seu@email.com" required>
+            <span class="erro"></span>
+          </div>
+          <div class="campo">
+            <label for="senha">Senha</label>
+            <div class="campo-senha"><input id="senha" name="senha" type="password" autocomplete="current-password" required><button type="button" class="mostrar-senha" aria-pressed="false">Mostrar</button></div>
+            <span class="erro"></span>
+          </div>
+          <div class="linha-link"><a href="#" id="esqueci">Esqueci minha senha</a></div>
+          <button class="botao botao-primario botao-largo" type="submit">Entrar</button>
+        </form>
+        <p class="rodape-form">Ainda não tem conta? <a href="cadastro.html">Criar conta</a></p>
+      </div>
+    </section>
+  </main>
+  <script src="assets/js/dados.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

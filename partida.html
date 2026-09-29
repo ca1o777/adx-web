@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalhes da partida | ADX – Aplicativo de Xadrez</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-tela="partida">
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="painel.html"><span class="marca-peca" aria-hidden="true">&#9822;&#xFE0E;</span>ADX</a>
+      <nav class="menu" aria-label="Menu principal"><a href="painel.html">Painel</a><a href="registrar-partida.html">Registrar partida</a><a href="historico.html" aria-current="page">Histórico</a><a href="ranking.html">Ranking</a><a href="perfil.html">Meu perfil</a></nav>
+      <div class="usuario"><span class="avatar" aria-hidden="true">CF</span><span>Caio Fernandes</span><a href="index.html">Sair</a></div>
+    </div>
+  </header>
+  <main class="conteudo">
+    <a class="voltar" href="historico.html">Voltar ao histórico</a>
+    <div class="cabecalho-pagina">
+      <div><h1 id="titulo-partida">Partida</h1><p>Detalhes da partida registrada.</p></div>
+    </div>
+    <div class="grade grade-2-1" id="detalhe">
+      <section class="painel">
+        <div class="confronto" id="confronto"></div>
+        <dl class="dados" id="dados"></dl>
+        <p class="aviso espaco-topo">Partidas registradas ficam no histórico e não podem ser excluídas.</p>
+      </section>
+      <aside class="painel">
+        <h2 id="retrospecto-titulo">Retrospecto</h2>
+        <p class="suave espaco-pequeno" id="retrospecto-resumo"></p>
+        <div class="espaco-pequeno" id="retrospecto-barra"></div>
+        <ul class="lista-simples" id="retrospecto-lista"></ul>
+      </aside>
+    </div>
+  </main>
+  <script src="assets/js/dados.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

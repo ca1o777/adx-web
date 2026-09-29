@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registrar partida | ADX – Aplicativo de Xadrez</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-tela="registrar">
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="painel.html"><span class="marca-peca" aria-hidden="true">&#9822;&#xFE0E;</span>ADX</a>
+      <nav class="menu" aria-label="Menu principal"><a href="painel.html">Painel</a><a href="registrar-partida.html" aria-current="page">Registrar partida</a><a href="historico.html">Histórico</a><a href="ranking.html">Ranking</a><a href="perfil.html">Meu perfil</a></nav>
+      <div class="usuario"><span class="avatar" aria-hidden="true">CF</span><span>Caio Fernandes</span><a href="index.html">Sair</a></div>
+    </div>
+  </header>
+  <main class="conteudo">
+    <div class="cabecalho-pagina">
+      <div><h1>Registrar partida</h1><p>Informe os dados da partida que você acabou de jogar.</p></div>
+    </div>
+    <div class="grade grade-form">
+      <section class="painel">
+        <div class="mensagem" id="mensagem" role="status" aria-live="polite"></div>
+        <form id="form-partida" novalidate>
+          <div class="campo">
+            <label for="adversario">Adversário</label>
+            <input id="adversario" name="adversario" type="text" autocomplete="off" placeholder="Nome do seu adversário" required>
+            <span class="erro"></span>
+          </div>
+          <fieldset class="campo" id="grupo-modo">
+            <legend>Modo de jogo</legend>
+            <div class="opcoes">
+              <label class="opcao"><input type="radio" name="modo" value="Clássico"><span>Clássico</span></label>
+              <label class="opcao"><input type="radio" name="modo" value="Rápido"><span>Rápido</span></label>
+              <label class="opcao"><input type="radio" name="modo" value="Blitz"><span>Blitz</span></label>
+            </div>
+            <span class="erro">Escolha o modo de jogo.</span>
+          </fieldset>
+          <fieldset class="campo" id="grupo-resultado">
+            <legend>Resultado</legend>
+            <div class="opcoes">
+              <label class="opcao opcao-vitoria"><input type="radio" name="resultado" value="Vitória"><span>Vitória</span></label>
+              <label class="opcao opcao-empate"><input type="radio" name="resultado" value="Empate"><span>Empate</span></label>
+              <label class="opcao opcao-derrota"><input type="radio" name="resultado" value="Derrota"><span>Derrota</span></label>
+            </div>
+            <span class="erro">Escolha o resultado da partida.</span>
+          </fieldset>
+          <div class="campo">
+            <label for="data">Data da partida</label>
+            <input id="data" name="data" type="text" readonly>
+            <span class="ajuda">Preenchida automaticamente no momento do registro.</span>
+          </div>
+          <p class="aviso">Confira os dados antes de registrar. Partidas registradas ficam no histórico e não podem ser excluídas.</p>
+          <div class="acoes">
+            <button class="botao botao-primario" type="submit">Registrar partida</button>
+            <a class="botao botao-secundario" href="painel.html">Cancelar</a>
+          </div>
+        </form>
+      </section>
+      <aside class="painel">
+        <div class="painel-titulo"><h2>Registradas recentemente</h2></div>
+        <ul class="lista-simples" id="recentes"></ul>
+        <p class="espaco-pequeno"><a href="historico.html">Ver histórico completo</a></p>
+      </aside>
+    </div>
+  </main>
+  <script src="assets/js/dados.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

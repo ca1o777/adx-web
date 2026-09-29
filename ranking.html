@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ranking de jogadores | ADX – Aplicativo de Xadrez</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-tela="ranking">
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="painel.html"><span class="marca-peca" aria-hidden="true">&#9822;&#xFE0E;</span>ADX</a>
+      <nav class="menu" aria-label="Menu principal"><a href="painel.html">Painel</a><a href="registrar-partida.html">Registrar partida</a><a href="historico.html">Histórico</a><a href="ranking.html" aria-current="page">Ranking</a><a href="perfil.html">Meu perfil</a></nav>
+      <div class="usuario"><span class="avatar" aria-hidden="true">CF</span><span>Caio Fernandes</span><a href="index.html">Sair</a></div>
+    </div>
+  </header>
+  <main class="conteudo">
+    <div class="cabecalho-pagina">
+      <div><h1>Ranking de jogadores</h1><p>Classificação pelo total de vitórias. Em caso de empate, vale o maior aproveitamento.</p></div>
+    </div>
+    <section class="painel">
+      <div class="tabela-rolagem">
+        <table class="planilha">
+          <thead><tr><th class="col-pos">Posição</th><th>Jogador</th><th class="col-dir">Partidas</th><th class="col-dir">Vitórias</th><th class="col-dir">Empates</th><th class="col-dir">Derrotas</th><th class="col-dir">Aproveitamento</th></tr></thead>
+          <tbody id="tabela-ranking"></tbody>
+        </table>
+      </div>
+      <p class="suave espaco-pequeno">Aproveitamento é a soma das vitórias com metade dos empates, dividida pelo total de partidas.</p>
+    </section>
+  </main>
+  <script src="assets/js/dados.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

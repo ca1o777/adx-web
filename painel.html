@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel | ADX – Aplicativo de Xadrez</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-tela="painel">
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="painel.html"><span class="marca-peca" aria-hidden="true">&#9822;&#xFE0E;</span>ADX</a>
+      <nav class="menu" aria-label="Menu principal"><a href="painel.html" aria-current="page">Painel</a><a href="registrar-partida.html">Registrar partida</a><a href="historico.html">Histórico</a><a href="ranking.html">Ranking</a><a href="perfil.html">Meu perfil</a></nav>
+      <div class="usuario"><span class="avatar" aria-hidden="true">CF</span><span>Caio Fernandes</span><a href="index.html">Sair</a></div>
+    </div>
+  </header>
+  <main class="conteudo">
+    <div class="cabecalho-pagina">
+      <div><h1>Painel</h1><p>Seus números são atualizados a cada partida registrada.</p></div>
+      <a class="botao botao-primario" href="registrar-partida.html">Registrar partida</a>
+    </div>
+    <div class="grade grade-2-1">
+      <section class="painel">
+        <div class="painel-titulo"><h2>Seu desempenho</h2></div>
+        <div class="placar" id="placar"></div>
+        <div id="barra"></div>
+        <div class="legenda-barra"><span class="suave">Aproveitamento geral</span><strong class="numero" id="aproveitamento"></strong></div>
+      </section>
+      <section class="painel">
+        <div class="painel-titulo"><h2>Sua posição</h2><a href="ranking.html">Ver ranking</a></div>
+        <div class="posicao numero" id="posicao"></div>
+        <p class="suave" id="posicao-texto"></p>
+        <p class="espaco-pequeno">A classificação considera o total de vitórias.</p>
+      </section>
+    </div>
+    <div class="grade grade-2-1 espaco-topo">
+      <section class="painel">
+        <div class="painel-titulo"><h2>Últimas partidas</h2><a href="historico.html">Ver histórico completo</a></div>
+        <div class="tabela-rolagem"><table class="planilha"><thead><tr><th>Data</th><th>Adversário</th><th>Modo</th><th>Resultado</th><th class="col-acao"><span class="oculto-visual">Ações</span></th></tr></thead><tbody id="ultimas"></tbody></table></div>
+      </section>
+      <section class="painel">
+        <div class="painel-titulo"><h2>Por modo de jogo</h2></div>
+        <div class="modos" id="modos"></div>
+      </section>
+    </div>
+  </main>
+  <script src="assets/js/dados.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

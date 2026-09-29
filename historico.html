@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Histórico de partidas | ADX – Aplicativo de Xadrez</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-tela="historico">
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="painel.html"><span class="marca-peca" aria-hidden="true">&#9822;&#xFE0E;</span>ADX</a>
+      <nav class="menu" aria-label="Menu principal"><a href="painel.html">Painel</a><a href="registrar-partida.html">Registrar partida</a><a href="historico.html" aria-current="page">Histórico</a><a href="ranking.html">Ranking</a><a href="perfil.html">Meu perfil</a></nav>
+      <div class="usuario"><span class="avatar" aria-hidden="true">CF</span><span>Caio Fernandes</span><a href="index.html">Sair</a></div>
+    </div>
+  </header>
+  <main class="conteudo">
+    <div class="cabecalho-pagina">
+      <div><h1>Histórico de partidas</h1><p>Todas as suas partidas, da mais recente para a mais antiga.</p></div>
+      <a class="botao botao-primario" href="registrar-partida.html">Registrar partida</a>
+    </div>
+    <section class="painel">
+      <div class="filtros">
+        <div class="campo"><label for="busca">Buscar adversário</label><input id="busca" type="search" placeholder="Digite um nome"></div>
+        <div class="campo"><label for="filtro-modo">Modo de jogo</label>
+          <select id="filtro-modo"><option value="">Todos</option><option>Clássico</option><option>Rápido</option><option>Blitz</option></select></div>
+        <div class="campo"><label for="filtro-resultado">Resultado</label>
+          <select id="filtro-resultado"><option value="">Todos</option><option>Vitória</option><option>Empate</option><option>Derrota</option></select></div>
+      </div>
+      <div class="tabela-rolagem">
+        <table class="planilha">
+          <thead><tr><th class="col-num">Nº</th><th>Data</th><th>Adversário</th><th>Modo</th><th>Resultado</th><th class="col-acao"><span class="oculto-visual">Ações</span></th></tr></thead>
+          <tbody id="tabela-historico"></tbody>
+        </table>
+      </div>
+      <div class="paginacao">
+        <span class="suave" id="contagem"></span>
+        <div class="acoes">
+          <button class="botao botao-secundario" id="anterior" type="button">Anterior</button>
+          <button class="botao botao-secundario" id="proxima" type="button">Próxima</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="assets/js/dados.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
