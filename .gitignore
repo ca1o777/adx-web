@@ -10,3 +10,8 @@ backend/.classpath
 backend/.project
 backend/.settings/
 backend/.factorypath
+.vscode/
+
+# Arquivos de trabalho da ferramenta de upgrade de Java do VS Code
+.github/modernize/
+backend/.github/modernize/
