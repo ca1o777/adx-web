@@ -2,6 +2,8 @@ package br.com.adx.service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Locale;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -11,10 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.adx.dto.DadosCadastro;
+import br.com.adx.dto.DadosLogin;
 import br.com.adx.dto.DadosUsuario;
 import br.com.adx.erro.RegraNegocioException;
 import br.com.adx.model.Usuario;
 import br.com.adx.repository.UsuarioRepository;
+import br.com.adx.seguranca.SessaoService;
 
 @Service
 public class AutenticacaoService {
@@ -24,13 +28,23 @@ public class AutenticacaoService {
     private static final int TAMANHO_MAXIMO_NOME_EXIBICAO = 40;
 
     private final UsuarioRepository usuarios;
+    private final SessaoService sessoes;
     private final PasswordEncoder codificador;
     private final Clock relogio;
+    /** Hash conferido quando o e-mail não existe, para a resposta demorar o mesmo que uma senha errada. */
+    private final String hashDeReferencia;
 
-    public AutenticacaoService(UsuarioRepository usuarios, PasswordEncoder codificador, Clock relogio) {
+    public AutenticacaoService(UsuarioRepository usuarios, SessaoService sessoes, PasswordEncoder codificador,
+            Clock relogio) {
         this.usuarios = usuarios;
+        this.sessoes = sessoes;
         this.codificador = codificador;
         this.relogio = relogio;
+        this.hashDeReferencia = codificador.encode("hash-de-referencia-do-adx");
+    }
+
+    /** Resultado de um login certo: o token da nova sessão e os dados do usuário. */
+    public record Login(String token, DadosUsuario usuario) {
     }
 
     /** RN001: cadastra o usuário com e-mail único e a senha guardada com BCrypt. */
@@ -53,6 +67,40 @@ public class AutenticacaoService {
         return DadosUsuario.de(usuario);
     }
 
+    /**
+     * RN003: confere e-mail e senha e abre uma sessão de 30 dias. Três senhas erradas seguidas bloqueiam
+     * o acesso por 15 minutos; durante o bloqueio, nem a senha certa entra. As respostas de erro não
+     * desfazem a transação, para que a contagem de senhas erradas fique gravada.
+     */
+    @Transactional(noRollbackFor = RegraNegocioException.class)
+    public Login entrar(DadosLogin dados) {
+        Instant agora = relogio.instant();
+        Usuario usuario = usuarios.findByEmail(normalizarEmail(dados.email())).orElse(null);
+        if (usuario == null) {
+            senhaConfere(dados.senha(), hashDeReferencia);
+            throw credenciaisInvalidas(); // mesma mensagem da senha errada: não revela quais e-mails existem
+        }
+        if (usuario.estaBloqueado(agora)) {
+            throw acessoBloqueado(usuario, agora);
+        }
+        if (!senhaConfere(dados.senha(), usuario.getSenhaHash())) {
+            usuario.registrarSenhaErrada(agora);
+            throw usuario.estaBloqueado(agora) ? acessoBloqueado(usuario, agora) : credenciaisInvalidas();
+        }
+        usuario.registrarLoginCorreto();
+        return new Login(sessoes.abrir(usuario), DadosUsuario.de(usuario));
+    }
+
+    public void sair(String token) {
+        sessoes.encerrar(token);
+    }
+
+    private boolean senhaConfere(String senha, String hash) {
+        // senhas acima do limite do BCrypt nunca são aceitas no cadastro
+        return senha.getBytes(StandardCharsets.UTF_8).length <= LIMITE_BYTES_DA_SENHA
+                && codificador.matches(senha, hash);
+    }
+
     /** E-mails são comparados sem diferenciar maiúsculas: "Caio@X.com" e "caio@x.com" são o mesmo. */
     static String normalizarEmail(String email) {
         return email.strip().toLowerCase(Locale.ROOT);
@@ -70,5 +118,16 @@ public class AutenticacaoService {
 
     private static RegraNegocioException emailJaCadastrado() {
         return RegraNegocioException.doCampo(HttpStatus.CONFLICT, "email", "Este e-mail já está cadastrado.");
+    }
+
+    private static RegraNegocioException credenciaisInvalidas() {
+        return new RegraNegocioException(HttpStatus.UNAUTHORIZED, "E-mail ou senha incorretos.");
+    }
+
+    private static RegraNegocioException acessoBloqueado(Usuario usuario, Instant agora) {
+        long segundos = Duration.between(agora, usuario.getBloqueadoAte()).toSeconds();
+        long minutos = Math.max(1, (segundos + 59) / 60);
+        return new RegraNegocioException(HttpStatus.LOCKED, "Acesso bloqueado por 3 senhas erradas seguidas. "
+                + "Tente novamente em " + minutos + (minutos == 1 ? " minuto." : " minutos."));
     }
 }

@@ -14,3 +14,11 @@ CREATE TABLE IF NOT EXISTS usuario (
     bloqueado_ate     TEXT,                          -- RN003: fim do bloqueio de 15 minutos
     criado_em         TEXT    NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS sessao (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id        INTEGER NOT NULL REFERENCES usuario (id) ON DELETE CASCADE,
+    token_hash        TEXT    NOT NULL UNIQUE,       -- SHA-256 do token do cookie (o token não é gravado)
+    criada_em         TEXT    NOT NULL,
+    expira_em         TEXT    NOT NULL               -- RN003: criada_em + 30 dias
+);
