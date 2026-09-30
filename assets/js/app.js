@@ -41,6 +41,56 @@
     return valor.toFixed(1).replace(".", ",") + "%";
   }
 
+  /* ---------- comunicação com o backend ---------- */
+  var TELAS_SEM_LOGIN = ["login", "cadastro"];
+
+  /* Chama a API REST. Devolve uma Promise com o JSON da resposta; em caso de erro,
+     rejeita com um Error que traz a mensagem do servidor, o status e os erros por campo. */
+  function api(metodo, caminho, corpo) {
+    var opcoes = { method: metodo, headers: { "Accept": "application/json" } };
+    if (corpo !== undefined) {
+      opcoes.headers["Content-Type"] = "application/json";
+      opcoes.body = JSON.stringify(corpo);
+    }
+    return fetch("api/" + caminho, opcoes).then(function (resposta) {
+      if (resposta.status === 204) return null;
+      return resposta.json().catch(function () { return {}; }).then(function (dados) {
+        if (resposta.ok) return dados;
+        /* sessão expirada numa tela interna: volta para o login */
+        if (resposta.status === 401 && TELAS_SEM_LOGIN.indexOf(document.body.getAttribute("data-tela")) === -1) {
+          window.location.href = "index.html";
+        }
+        var erro = new Error(dados.erro || "Não foi possível concluir a operação. Tente de novo.");
+        erro.status = resposta.status;
+        erro.campos = dados.campos || {};
+        throw erro;
+      });
+    }, function () {
+      throw new Error("Não foi possível falar com o servidor. Confira se ele está rodando e tente de novo.");
+    });
+  }
+
+  function iniciais(nome) {
+    var partes = nome.trim().split(/\s+/);
+    var letras = partes[0].charAt(0) + (partes.length > 1 ? partes[partes.length - 1].charAt(0) : "");
+    return letras.toUpperCase();
+  }
+
+  /* Cabeçalho das telas internas: nome e iniciais do usuário logado, e o link Sair */
+  function prepararCabecalho() {
+    var caixa = $(".usuario");
+    if (!caixa) return;
+    api("GET", "auth/sessao").then(function (usuario) {
+      $(".avatar", caixa).textContent = iniciais(usuario.nomeExibicao);
+      $(".usuario-nome", caixa).textContent = usuario.nomeExibicao;
+    }).catch(function () { /* sem sessão, a função api já leva para o login */ });
+    $(".sair", caixa).addEventListener("click", function (ev) {
+      ev.preventDefault();
+      var irParaLogin = function () { window.location.href = "index.html"; };
+      api("POST", "auth/logout").then(irParaLogin, irParaLogin);
+    });
+  }
+
   /* partidas de demonstração + partidas registradas neste navegador */
   function lerNovas() {
     try { return JSON.parse(localStorage.getItem(CHAVE_NOVAS)) || []; } catch (e) { return []; }
@@ -129,18 +179,28 @@
 
   telas.login = function () {
     ativarMostrarSenha();
-    $("#form-login").addEventListener("submit", function (ev) {
+    var form = $("#form-login"), botao = $('button[type="submit"]', form);
+    form.addEventListener("submit", function (ev) {
       ev.preventDefault();
       var email = $("#email"), senha = $("#senha");
       var ok = marcar(email, !EMAIL_OK.test(email.value.trim()), "Informe um e-mail válido.");
       ok = marcar(senha, senha.value.length === 0, "Informe sua senha.") && ok;
-      if (ok) window.location.href = "painel.html";   /* autenticação real: backend (2º bimestre) */
+      if (!ok) return;
+      botao.disabled = true;
+      api("POST", "auth/login", { email: email.value.trim(), senha: senha.value }).then(function () {
+        window.location.href = "painel.html";
+      }).catch(function (erro) {
+        /* senha errada (401), acesso bloqueado (423) ou servidor fora do ar */
+        mostrarMensagem($("#mensagem"), "falha", erro.message);
+        botao.disabled = false;
+      });
     });
   };
 
   telas.cadastro = function () {
     ativarMostrarSenha();
-    $("#form-cadastro").addEventListener("submit", function (ev) {
+    var form = $("#form-cadastro"), botao = $('button[type="submit"]', form);
+    form.addEventListener("submit", function (ev) {
       ev.preventDefault();
       var nome = $("#nome"), email = $("#email"), senha = $("#senha"), conf = $("#confirmar");
       var ok = marcar(nome, nome.value.trim().split(/\s+/).length < 2, "Informe nome e sobrenome.");
@@ -148,8 +208,21 @@
       ok = marcar(senha, senha.value.length < 8, "A senha precisa ter pelo menos 8 caracteres.") && ok;
       ok = marcar(conf, conf.value !== senha.value || !conf.value, "As senhas não são iguais.") && ok;
       if (!ok) return;
-      mostrarMensagem($("#mensagem"), "sucesso", "Conta criada. Redirecionando para o login...");
-      setTimeout(function () { window.location.href = "index.html"; }, 1400);
+      botao.disabled = true;
+      var dados = { nome: nome.value.trim(), email: email.value.trim(), senha: senha.value };
+      api("POST", "auth/cadastro", dados).then(function () {
+        mostrarMensagem($("#mensagem"), "sucesso", "Conta criada. Redirecionando para o login...");
+        setTimeout(function () { window.location.href = "index.html"; }, 1400);
+      }).catch(function (erro) {
+        /* erros por campo (ex.: e-mail já cadastrado) aparecem embaixo do campo; os demais, no topo */
+        var campos = { nome: nome, email: email, senha: senha }, marcou = false;
+        Object.keys(erro.campos || {}).forEach(function (chave) {
+          if (campos[chave]) { marcar(campos[chave], true, erro.campos[chave]); marcou = true; }
+        });
+        if (marcou) $("#mensagem").className = "mensagem";
+        else mostrarMensagem($("#mensagem"), "falha", erro.message);
+        botao.disabled = false;
+      });
     });
   };
 
@@ -308,6 +381,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     var tela = document.body.getAttribute("data-tela");
+    prepararCabecalho();
     if (telas[tela]) telas[tela]();
   });
 })();
