@@ -1,10 +1,22 @@
-# ADX – Aplicativo de Xadrez (Aplicação Web) · Frontend
+# ADX – Aplicativo de Xadrez (Aplicação Web)
 
-Frontend da aplicação web ADX, entregue no 1º bimestre. O backend em Java e o banco de dados serão integrados no 2º bimestre.
+Aplicação web do ADX. O frontend foi entregue no 1º bimestre; o backend em Java com banco de dados está sendo integrado no 2º bimestre, em etapas.
 
 ## Como executar
 
-Não precisa instalar nada. Basta abrir o arquivo `index.html` em um navegador moderno (Chrome, Edge ou Firefox).
+É preciso ter o JDK 17 ou mais novo instalado. O Maven é baixado sozinho pelo Maven Wrapper na primeira execução.
+
+```
+cd backend
+./mvnw spring-boot:run        (Git Bash, Linux ou macOS)
+.\mvnw.cmd spring-boot:run    (PowerShell)
+```
+
+Depois abra http://localhost:8080 no navegador. O próprio Spring Boot serve as páginas.
+
+- O comando deve ser executado de dentro da pasta `backend/`.
+- O banco de dados é o arquivo `backend/adx.db` (SQLite), criado na primeira execução. Ele não vai para o Git.
+- Para rodar os testes automatizados: `./mvnw test`.
 
 ## Telas
 
@@ -22,17 +34,39 @@ Não precisa instalar nada. Basta abrir o arquivo `index.html` em um navegador m
 ## Estrutura
 
 ```
-adx-web-frontend/
+adx-web/
 ├── *.html                 páginas da aplicação
-└── assets/
-    ├── css/style.css      estilos de todas as telas
-    ├── js/app.js          lógica, navegação e validações dos formulários
-    ├── js/dados.js        dados de demonstração (serão substituídos pelo backend)
-    └── fonts/             fontes Barlow (uso offline)
+├── assets/
+│   ├── css/style.css      estilos de todas as telas
+│   ├── js/app.js          lógica das telas e chamadas à API (fetch)
+│   ├── js/dados.js        dados de demonstração das telas ainda não integradas
+│   └── fonts/             fontes Barlow (uso offline)
+└── backend/               API em Java (Spring Boot 3, Spring Data JPA, SQLite)
+    ├── mvnw, mvnw.cmd     Maven Wrapper
+    ├── pom.xml
+    └── src/
+        ├── main/java/br/com/adx/   config, controller, service, repository, model, dto, seguranca, erro
+        ├── main/resources/         application.properties, schema.sql (tabelas)
+        └── test/java/br/com/adx/   testes de integração
 ```
+
+## API
+
+Os erros seguem o formato `{"erro": "mensagem", "campos": {"campo": "mensagem"}}`.
+
+| Rota | O que faz |
+|---|---|
+| `POST /api/auth/cadastro` | Cria a conta com `{nome, email, senha}`. 201; 400 se algum campo for inválido; 409 se o e-mail já existir |
+| `POST /api/auth/login` | Recebe `{email, senha}`. 200 e o cookie de sessão; 401 se o e-mail ou a senha estiverem errados; 423 se o acesso estiver bloqueado |
+| `POST /api/auth/logout` | Encerra a sessão e apaga o cookie. 204 |
+| `GET /api/auth/sessao` | Dados do usuário logado. 200; 401 sem login |
+
+## Regras já implementadas no backend
+
+- **RN001:** o e-mail é único (sem diferenciar maiúsculas) e a senha é guardada com BCrypt.
+- **RN003:** sem login, só as telas de login e cadastro abrem, e a API responde 401. A sessão dura até 30 dias. Três senhas erradas seguidas bloqueiam o acesso por 15 minutos.
 
 ## Observações
 
-- Os dados exibidos são de demonstração e ficam em `assets/js/dados.js`.
-- Partidas registradas na tela *Registrar partida* ficam salvas apenas no navegador (localStorage) até a integração com o backend.
-- Autenticação real, bloqueio após três tentativas (RN003) e verificação de e-mail duplicado (RN001) serão feitos no backend.
+- Login, cadastro e o cabeçalho das telas já usam a API. Painel, partidas, histórico, ranking e perfil ainda mostram os dados de demonstração de `assets/js/dados.js`, e serão integrados nas próximas etapas.
+- "Esqueci minha senha", alteração de e-mail, redefinição de senha e exclusão de conta são apenas visuais.
