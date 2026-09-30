@@ -3,6 +3,7 @@ package br.com.adx.controller;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import br.com.adx.dto.DadosCadastro;
 import br.com.adx.dto.DadosLogin;
 import br.com.adx.dto.DadosUsuario;
 import br.com.adx.seguranca.CookieDeSessao;
+import br.com.adx.seguranca.UsuarioLogado;
 import br.com.adx.service.AutenticacaoService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -50,5 +52,10 @@ public class AutenticacaoController {
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, CookieDeSessao.apagar(request.isSecure()).toString())
                 .build();
+    }
+
+    @GetMapping("/sessao")
+    public DadosUsuario sessao(@UsuarioLogado Long usuarioId) {
+        return servico.usuarioLogado(usuarioId);
     }
 }

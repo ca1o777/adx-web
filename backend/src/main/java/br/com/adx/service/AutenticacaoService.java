@@ -95,6 +95,14 @@ public class AutenticacaoService {
         sessoes.encerrar(token);
     }
 
+    /** Dados do usuário logado, para o cabeçalho das telas. */
+    @Transactional(readOnly = true)
+    public DadosUsuario usuarioLogado(Long usuarioId) {
+        return usuarios.findById(usuarioId)
+                .map(DadosUsuario::de)
+                .orElseThrow(() -> new RegraNegocioException(HttpStatus.UNAUTHORIZED, "Faça login para continuar."));
+    }
+
     private boolean senhaConfere(String senha, String hash) {
         // senhas acima do limite do BCrypt nunca são aceitas no cadastro
         return senha.getBytes(StandardCharsets.UTF_8).length <= LIMITE_BYTES_DA_SENHA
