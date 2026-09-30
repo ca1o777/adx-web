@@ -1,0 +1,12 @@
+# Backend: build do Maven e banco SQLite local
+backend/target/
+backend/adx.db
+backend/adx.db-*
+
+# Arquivos de IDE
+.idea/
+*.iml
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/.factorypath
