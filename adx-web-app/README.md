@@ -57,6 +57,7 @@ O ADX lê a configuração SMTP do ambiente no início da execução. Reinicie o
 | `ADX_SMTP_MODO` | `starttls` (padrão), `ssl` ou `local` |
 | `ADX_SMTP_PORTA` | Padrão 587 em STARTTLS ou 465 em SSL. No Mailpit use 1025. |
 | `ADX_SMTP_USUARIO` e `ADX_SMTP_SENHA` | Credenciais do provedor quando exigidas. Defina apenas no ambiente do servidor. |
+| `ADX_SMTP_CAIXA_LOCAL_URL` | Opcional no modo `local`. Endereço HTTP da página inicial da caixa de teste em `127.0.0.1` ou `[::1]`, com porta opcional. |
 
 Para entregar mensagens a caixas externas, configure um provedor SMTP que autorize o remetente. Os modos `starttls` e `ssl` verificam o certificado do servidor e exigem conexão criptografada. Sem configuração SMTP, o ADX continua disponível para as demais funções e informa que o serviço de e-mail está indisponível.
 
@@ -77,11 +78,12 @@ $env:ADX_SMTP_HOST = '127.0.0.1'
 $env:ADX_SMTP_PORTA = '1025'
 $env:ADX_SMTP_MODO = 'local'
 $env:ADX_SMTP_REMETENTE = 'adx@example.test'
+$env:ADX_SMTP_CAIXA_LOCAL_URL = 'http://127.0.0.1:8025/'
 Remove-Item Env:ADX_SMTP_USUARIO, Env:ADX_SMTP_SENHA -ErrorAction SilentlyContinue
 .\executar-demo.bat '-Dadx.endereco=127.0.0.1' '-Dadx.db=jdbc:h2:file:./data/apresentacao'
 ```
 
-Abra [o ADX](http://127.0.0.1:8080) e [a caixa local](http://127.0.0.1:8025). Cadastre um e-mail fictício, como `jogador@example.test`. Faça o pedido no ADX, leia o código no Mailpit e volte ao formulário para confirmar. Quando a primeira execução terminar com sucesso, acrescente `-o` ao comando do ADX para ensaiar offline. Mantenha os dois terminais abertos durante a demonstração.
+Abra [o ADX](http://127.0.0.1:8080) e cadastre um e-mail fictício, como `jogador@example.test`. Solicite o código e clique em **Abrir caixa de teste**. O Mailpit abre em uma nova aba. Leia o código e volte ao formulário para confirmar. Quando a primeira execução terminar com sucesso, acrescente `-o` ao comando do ADX para ensaiar offline. Mantenha os dois terminais abertos durante a demonstração.
 
 ## Estrutura
 

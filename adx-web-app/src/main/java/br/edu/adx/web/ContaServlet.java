@@ -109,7 +109,7 @@ public class ContaServlet extends ApiServlet {
                     erro(resp, 503, CORREIO_INDISPONIVEL);
                     return;
                 }
-                json(resp, 202, Map.of("mensagem", "Código enviado ao e-mail atual da conta."));
+                responderSolicitacao(resp, "Código enviado ao e-mail atual da conta.");
             }
             default -> throw new IllegalStateException("Estado inesperado na solicitação de e-mail.");
         }
@@ -154,7 +154,14 @@ public class ContaServlet extends ApiServlet {
             erro(resp, 503, "Muitas solicitações de recuperação. Tente novamente mais tarde.");
             return;
         }
-        json(resp, 202, Map.of("mensagem", SENHA_SOLICITADA));
+        responderSolicitacao(resp, SENHA_SOLICITADA);
+    }
+
+    private void responderSolicitacao(HttpServletResponse resp, String mensagem) throws IOException {
+        Map<String, String> resposta = new LinkedHashMap<>();
+        resposta.put("mensagem", mensagem);
+        correio.caixaDeEntrada().ifPresent(url -> resposta.put("caixaDeEntrada", url));
+        json(resp, 202, resposta);
     }
 
     private void entregarRecuperacao(String email) {

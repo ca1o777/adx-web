@@ -180,7 +180,7 @@ function createApp(screen, options = {}) {
   };
   window.alert = text => alerts.push(String(text));
   vm.runInNewContext(fs.readFileSync(path.join(WEB, 'assets/js/app.js'), 'utf8'), {
-    document, window, fetch, URLSearchParams, Date, AbortController,
+    document, window, fetch, URL, URLSearchParams, Date, AbortController,
     alert: window.alert,
     setTimeout(callback, delay = 0) { const id = nextTimer++; timers.set(id, { at: now + delay, callback }); return id; },
     clearTimeout(id) { timers.delete(id); }

@@ -6,6 +6,19 @@ const { createApp, settle, user } = require('./ambiente.cjs');
 
 const codigo = 'a23b45c67d89efgh';
 const senha = 'senha-exemplo';
+const caixaLocal = 'http://127.0.0.1:8025/';
+
+function verificarCaixa(link, endereco) {
+  assert.equal(link.getAttribute('href'), endereco);
+  assert.equal(link.getAttribute('hidden'), endereco ? null : '');
+  if (endereco) {
+    assert.equal(link.tagName, 'a');
+    assert.equal(link.getAttribute('target'), '_blank');
+    assert.match(link.getAttribute('rel'), /\bnoopener\b/);
+    assert.match(link.getAttribute('rel'), /\bnoreferrer\b/);
+    assert.match(link.textContent, /Abrir caixa de teste.*nova aba/);
+  }
+}
 
 function params(request) {
   return Object.fromEntries(new URLSearchParams(request.init.body));
@@ -20,6 +33,8 @@ async function perfil() {
 
 test('perfil: envia solicitação de e-mail e confirma antes de exibir o novo endereço', async () => {
   const app = await perfil();
+  const caixa = app.node('caixa-email');
+  verificarCaixa(caixa, null);
   app.node('novo-email').value = 'novo@example.com';
   app.node('senha-atual').value = senha;
   app.node('form-email-solicitar').dispatch('submit');
@@ -28,8 +43,9 @@ test('perfil: envia solicitação de e-mail e confirma antes de exibir o novo en
   assert.equal(chamadas.length, 1);
   assert.deepEqual(params(chamadas[0]), { email: 'novo@example.com', senha });
   assert.equal(app.node('senha-atual').value, '');
-  chamadas[0].respond({ mensagem: 'Confira a caixa de entrada.' }, 202);
+  chamadas[0].respond({ mensagem: 'Confira a caixa de entrada.', caixaDeEntrada: caixaLocal }, 202);
   await settle();
+  verificarCaixa(caixa, caixaLocal);
   assert.equal(app.node('email-atual').textContent, 'ana@example.com');
   assert.equal(app.document.activeElement, app.node('codigo-email'));
   app.node('codigo-email').value = codigo;
@@ -41,6 +57,7 @@ test('perfil: envia solicitação de e-mail e confirma antes de exibir o novo en
   assert.equal(app.node('email-atual').textContent, 'novo@example.com');
   assert.equal(app.node('codigo-email').value, '');
   assert.equal(app.node('mensagem-email').textContent, 'E-mail atualizado.');
+  verificarCaixa(caixa, null);
 });
 
 test('perfil: senha atual incorreta conserva o e-mail e permite nova tentativa', async () => {
@@ -54,18 +71,22 @@ test('perfil: senha atual incorreta conserva o e-mail e permite nova tentativa',
   assert.equal(app.node('form-email-solicitar').getAttribute('hidden'), null);
   assert.equal(app.node('form-email-solicitar').querySelector('button[type=submit]').disabled, false);
   assert.equal(app.node('mensagem-email').getAttribute('role'), 'alert');
+  verificarCaixa(app.node('caixa-email'), null);
   assert.equal(app.window.location.href, 'perfil.html');
 });
 
 test('recuperação pública: solicita por e-mail, valida confirmação e volta ao login com nova senha', async () => {
   const app = createApp('recuperar-senha');
+  const caixa = app.node('caixa-recuperacao');
+  verificarCaixa(caixa, null);
   assert.equal(app.requests.length, 0);
   app.node('email-recuperacao').value = 'ana@example.com';
   app.node('form-recuperacao-solicitar').dispatch('submit');
   const solicitacao = app.request('api/conta/senha/solicitar');
   assert.deepEqual(params(solicitacao), { email: 'ana@example.com' });
-  solicitacao.respond({ mensagem: 'Se o e-mail estiver cadastrado, você receberá um código.' }, 202);
+  solicitacao.respond({ mensagem: 'Se o e-mail estiver cadastrado, você receberá um código.', caixaDeEntrada: caixaLocal }, 202);
   await settle();
+  verificarCaixa(caixa, caixaLocal);
   assert.equal(app.node('email-confirmacao').value, 'ana@example.com');
   assert.equal(app.document.activeElement, app.node('codigo-recuperacao'));
   app.node('codigo-recuperacao').value = codigo;
@@ -85,6 +106,31 @@ test('recuperação pública: solicita por e-mail, valida confirmação e volta 
   assert.equal(app.node('mensagem-recuperacao').textContent, 'Senha redefinida.');
   assert.equal(app.document.activeElement, app.node('voltar-login'));
   assert.equal(app.node('voltar-login').getAttribute('href'), 'index.html');
+  verificarCaixa(caixa, null);
+});
+
+test('recuperação pública: limpa o atalho ao recomeçar e só o exibe com a caixa local configurada', async () => {
+  const app = createApp('recuperar-senha');
+  const form = app.node('form-recuperacao-solicitar');
+  const voltar = app.node('voltar-recuperacao');
+  const caixa = app.node('caixa-recuperacao');
+  app.node('email-recuperacao').value = 'ana@example.com';
+  app.node('ja-tenho-codigo-senha').dispatch('click');
+  verificarCaixa(caixa, null);
+  voltar.dispatch('click');
+  const caixas = ['http://[::1]:8025/', undefined, 'endereco-invalido', 'https://example.com/', caixaLocal + 'mensagem'];
+  for (const [indice, caixaDeEntrada] of caixas.entries()) {
+    form.dispatch('submit');
+    app.request('api/conta/senha/solicitar', indice).respond({ caixaDeEntrada }, 202);
+    await settle();
+    verificarCaixa(caixa, indice === 0 ? caixaDeEntrada : null);
+    voltar.dispatch('click');
+    verificarCaixa(caixa, null);
+  }
+  form.dispatch('submit');
+  app.request('api/conta/senha/solicitar', caixas.length).respond({ erro: 'Falha', caixaDeEntrada: caixaLocal }, 503);
+  await settle();
+  verificarCaixa(caixa, null);
 });
 
 test('perfil: foto envia o arquivo em bytes, atualiza os avatares e permite remover', async () => {

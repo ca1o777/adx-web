@@ -10,15 +10,19 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /** Envia mensagens de conta pelo servidor SMTP configurado no ambiente. */
 public class Correio {
+    private static final Pattern URL_CAIXA_LOCAL = Pattern.compile("http://(?:127\\.0\\.0\\.1|\\[::1\\])(?::([0-9]{1,5}))?/?");
     private final String host;
     private final String remetente;
     private final String usuario;
     private final String senha;
     private final String modo;
+    private final String caixaLocal;
     private final int porta;
 
     public Correio() {
@@ -31,6 +35,7 @@ public class Correio {
         usuario = ambiente.getOrDefault("ADX_SMTP_USUARIO", "").strip();
         senha = ambiente.getOrDefault("ADX_SMTP_SENHA", "");
         modo = ambiente.getOrDefault("ADX_SMTP_MODO", "starttls").strip();
+        caixaLocal = ambiente.getOrDefault("ADX_SMTP_CAIXA_LOCAL_URL", "").strip();
         String padrao = "ssl".equals(modo) ? "465" : "587";
         porta = lerPorta(ambiente.getOrDefault("ADX_SMTP_PORTA", padrao));
     }
@@ -43,6 +48,18 @@ public class Correio {
             return ("127.0.0.1".equals(host) || "::1".equals(host)) && usuario.isEmpty() && senha.isEmpty();
         }
         return ("starttls".equals(modo) || "ssl".equals(modo)) && usuario.isEmpty() == senha.isEmpty();
+    }
+
+    public Optional<String> caixaDeEntrada() {
+        var endereco = URL_CAIXA_LOCAL.matcher(caixaLocal);
+        if (!"local".equals(modo) || !configurado() || !endereco.matches()) {
+            return Optional.empty();
+        }
+        int portaHttp = endereco.group(1) == null ? 80 : Integer.parseInt(endereco.group(1));
+        if (portaHttp < 1 || portaHttp > 65_535) {
+            return Optional.empty();
+        }
+        return Optional.of(caixaLocal);
     }
 
     public void enviar(String destino, String assunto, String texto) throws IOException {

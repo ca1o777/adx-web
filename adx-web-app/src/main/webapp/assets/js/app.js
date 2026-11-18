@@ -183,6 +183,17 @@
   function validarCodigo(campo) {
     return marcar(campo, !/^[A-Z0-9]{16}$/i.test(campo.value.trim()), "Informe os 16 caracteres do código recebido.");
   }
+  function atualizarLinkCaixa(link, endereco) {
+    link.setAttribute("hidden", "");
+    link.removeAttribute("href");
+    if (!endereco) return;
+    var url;
+    try { url = new URL(endereco); } catch (erro) { return; }
+    if (url.protocol !== "http:" || (url.hostname !== "127.0.0.1" && url.hostname !== "[::1]")) return;
+    if (url.href !== url.origin + "/") return;
+    link.setAttribute("href", url.href);
+    link.removeAttribute("hidden");
+  }
 
   /* ---------- cabeçalho (usuário logado e sair) ---------- */
   var URL_FOTO = "api/perfil/foto";
@@ -554,7 +565,7 @@
   function ativarAlteracaoEmail(atualizarEmail) {
     var solicitar = $("#form-email-solicitar"), confirmar = $("#form-email-confirmar");
     var email = $("#novo-email"), senha = $("#senha-atual"), codigo = $("#codigo-email");
-    var mensagem = $("#mensagem-email");
+    var mensagem = $("#mensagem-email"), caixa = $("#caixa-email");
 
     aoEnviar(solicitar, function () {
       var valido = validarEmail(email);
@@ -569,6 +580,7 @@
           return;
         }
         mostrarMensagem(mensagem, "sucesso", r.corpo.mensagem || "Confira o código no seu e-mail atual.");
+        atualizarLinkCaixa(caixa, r.corpo.caixaDeEntrada);
         alternarFormulario(solicitar, confirmar, codigo);
       }));
     });
@@ -583,6 +595,7 @@
         atualizarEmail(r.corpo.usuario.email);
         solicitar.reset();
         confirmar.reset();
+        atualizarLinkCaixa(caixa);
         alternarFormulario(confirmar, solicitar, email);
         mostrarMensagem(mensagem, "sucesso", r.corpo.mensagem || "E-mail atualizado.");
       }));
@@ -596,6 +609,7 @@
       if (ocupado(confirmar)) return;
       confirmar.reset();
       marcar(codigo, false);
+      atualizarLinkCaixa(caixa);
       alternarFormulario(confirmar, solicitar, email);
     });
   }
@@ -604,7 +618,7 @@
     var solicitar = $("#form-recuperacao-solicitar"), confirmar = $("#form-recuperacao-confirmar");
     var email = $("#email-recuperacao"), emailConfirmacao = $("#email-confirmacao");
     var codigo = $("#codigo-recuperacao"), senha = $("#senha-nova"), repeticao = $("#confirmar-senha-nova");
-    var mensagem = $("#mensagem-recuperacao");
+    var mensagem = $("#mensagem-recuperacao"), caixa = $("#caixa-recuperacao");
 
     function mostrarConfirmacao(endereco) {
       emailConfirmacao.value = endereco;
@@ -619,6 +633,7 @@
           return;
         }
         mostrarMensagem(mensagem, "sucesso", r.corpo.mensagem || "Se o e-mail estiver cadastrado, você receberá um código.");
+        atualizarLinkCaixa(caixa, r.corpo.caixaDeEntrada);
         mostrarConfirmacao(endereco);
       }));
     });
@@ -637,6 +652,7 @@
         confirmar.reset();
         solicitar.reset();
         confirmar.setAttribute("hidden", "");
+        atualizarLinkCaixa(caixa);
         mostrarMensagem(mensagem, "sucesso", r.corpo.mensagem || "Senha redefinida.");
         var login = $("#voltar-login");
         login.textContent = "Entrar com a nova senha";
@@ -652,6 +668,7 @@
       if (ocupado(confirmar)) return;
       confirmar.reset();
       [codigo, senha, repeticao].forEach(function (campo) { marcar(campo, false); });
+      atualizarLinkCaixa(caixa);
       alternarFormulario(confirmar, solicitar, email);
     });
   };
