@@ -2,6 +2,8 @@
 
 A aplicação web ADX registra resultados de partidas de xadrez e permite consultar o histórico, as estatísticas e o ranking dos jogadores. A implementação em Java está em [`adx-web-app`](adx-web-app/), com servidor Tomcat embutido, banco H2 e interface em HTML, CSS e JavaScript.
 
+Na versão da entrega A2, o jogador pode gerenciar a foto de perfil, confirmar a alteração de e-mail e recuperar a senha. O [guia de e-mail](adx-web-app/README.md#e-mails-de-confirmação) explica a configuração SMTP e a demonstração local.
+
 ## Executar a aplicação web no Windows
 
 1. Instale um JDK 17 ou superior.

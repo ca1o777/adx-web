@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recuperar senha | ADX – Aplicativo de Xadrez</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-tela="recuperar-senha">
+  <main class="acesso">
+    <div class="acesso-tabuleiro" aria-hidden="true">
+      <div class="acesso-marca"><strong>ADX</strong><span>Aplicativo de Xadrez</span></div>
+    </div>
+    <section class="acesso-form">
+      <div class="formulario">
+        <h1>Recuperar senha</h1>
+        <p class="subtitulo">Use o e-mail cadastrado para receber um código e definir uma nova senha.</p>
+        <div class="mensagem" id="mensagem-recuperacao" role="status" aria-live="polite" aria-atomic="true"></div>
+        <form id="form-recuperacao-solicitar" novalidate>
+          <div class="campo">
+            <label for="email-recuperacao">E-mail cadastrado</label>
+            <input id="email-recuperacao" type="email" autocomplete="email" maxlength="120" aria-describedby="email-recuperacao-erro" required>
+            <span class="erro" id="email-recuperacao-erro"></span>
+          </div>
+          <button class="botao botao-primario botao-largo" type="submit">Enviar código</button>
+          <p class="rodape-form"><button class="botao-texto" id="ja-tenho-codigo-senha" type="button">Já tenho um código</button></p>
+        </form>
+        <form id="form-recuperacao-confirmar" novalidate hidden>
+          <div class="campo">
+            <label for="email-confirmacao">E-mail cadastrado</label>
+            <input id="email-confirmacao" type="email" readonly>
+          </div>
+          <div class="campo">
+            <label for="codigo-recuperacao">Código de recuperação</label>
+            <input id="codigo-recuperacao" type="text" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" maxlength="24" aria-describedby="codigo-recuperacao-erro" required>
+            <span class="erro" id="codigo-recuperacao-erro"></span>
+          </div>
+          <div class="campo">
+            <label for="senha-nova">Nova senha</label>
+            <input id="senha-nova" type="password" autocomplete="new-password" minlength="8" maxlength="72" aria-describedby="senha-nova-ajuda senha-nova-erro" required>
+            <span class="ajuda" id="senha-nova-ajuda">Use de 8 a 72 caracteres.</span>
+            <span class="erro" id="senha-nova-erro"></span>
+          </div>
+          <div class="campo">
+            <label for="confirmar-senha-nova">Confirmar nova senha</label>
+            <input id="confirmar-senha-nova" type="password" autocomplete="new-password" maxlength="72" aria-describedby="confirmar-senha-nova-erro" required>
+            <span class="erro" id="confirmar-senha-nova-erro"></span>
+          </div>
+          <button class="botao botao-primario botao-largo" type="submit">Salvar nova senha</button>
+          <p class="rodape-form"><button class="botao-texto" id="voltar-recuperacao" type="button">Solicitar outro código</button></p>
+        </form>
+        <p class="rodape-form"><a href="index.html" id="voltar-login">Voltar para o login</a></p>
+      </div>
+    </section>
+  </main>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

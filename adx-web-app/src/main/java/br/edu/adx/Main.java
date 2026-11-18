@@ -1,8 +1,11 @@
 package br.edu.adx;
 
 import br.edu.adx.dao.Banco;
+import br.edu.adx.dao.FotoDao;
 import br.edu.adx.web.AutenticacaoServlet;
+import br.edu.adx.web.ContaServlet;
 import br.edu.adx.web.FiltroAcesso;
+import br.edu.adx.web.FotoServlet;
 import br.edu.adx.web.PainelServlet;
 import br.edu.adx.web.PartidasServlet;
 import br.edu.adx.web.PerfilServlet;
@@ -34,6 +37,7 @@ public class Main {
         }
 
         Banco.iniciar();
+        FotoDao.iniciar();
         if (Arrays.asList(args).contains("--demo")) {
             DadosDemo.popular();
         }
@@ -41,7 +45,12 @@ public class Main {
         Tomcat tomcat = new Tomcat();
         tomcat.setBaseDir(Files.createTempDirectory("adx-tomcat").toString());
         tomcat.setPort(porta);
-        tomcat.getConnector();
+        String endereco = System.getProperty("adx.endereco");
+        if (endereco != null) {
+            tomcat.getConnector().setProperty("address", endereco);
+        } else {
+            tomcat.getConnector();
+        }
 
         Context ctx = tomcat.addContext("", web.toString());
         ctx.setRequestCharacterEncoding("UTF-8");
@@ -79,6 +88,9 @@ public class Main {
         mapear(ctx, "painel", new PainelServlet(), "/api/painel");
         mapear(ctx, "ranking", new RankingServlet(), "/api/ranking");
         mapear(ctx, "perfil", new PerfilServlet(), "/api/perfil");
+        mapear(ctx, "foto-perfil", new FotoServlet(), "/api/perfil/foto");
+        mapear(ctx, "conta", new ContaServlet(), "/api/conta/email/solicitar", "/api/conta/email/confirmar",
+                "/api/conta/senha/solicitar", "/api/conta/senha/confirmar");
 
         tomcat.start();
         System.out.println();

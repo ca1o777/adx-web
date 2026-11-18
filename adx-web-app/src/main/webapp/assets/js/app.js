@@ -47,9 +47,12 @@
   function plural(n, singular, pluralTxt) { return n + " " + (n === 1 ? singular : pluralTxt); }
 
   /* ---------- comunicação com a API ---------- */
-  function api(metodo, url, dados) {
+  function api(metodo, url, dados, tipoArquivo) {
     var opcoes = { method: metodo, credentials: "same-origin", headers: { "X-Requested-With": "ADX" } };
-    if (dados) {
+    if (tipoArquivo) {
+      opcoes.headers["Content-Type"] = tipoArquivo;
+      opcoes.body = dados;
+    } else if (dados) {
       opcoes.headers["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
       opcoes.body = new URLSearchParams(dados).toString();
     }
@@ -152,9 +155,59 @@
     });
   }
 
+  function ocupado(formulario) { return formulario.getAttribute("aria-busy") === "true"; }
+  function aoEnviar(formulario, acao) {
+    formulario.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      if (!ocupado(formulario) && formulario.getAttribute("hidden") === null) acao();
+    });
+  }
+  function aguardarEnvio(formulario, promessa) {
+    var controles = $$("button, input", formulario).filter(function (controle) { return !controle.disabled; });
+    formulario.setAttribute("aria-busy", "true");
+    controles.forEach(function (controle) { controle.disabled = true; });
+    return promessa.finally(function () {
+      formulario.removeAttribute("aria-busy");
+      controles.forEach(function (controle) { controle.disabled = false; });
+    });
+  }
+  function alternarFormulario(anterior, proximo, campo) {
+    anterior.setAttribute("hidden", "");
+    proximo.removeAttribute("hidden");
+    campo.focus();
+  }
+  function validarEmail(campo) {
+    var email = campo.value.trim();
+    return marcar(campo, email.length > 120 || !EMAIL_OK.test(email), "Informe um e-mail válido.");
+  }
+  function validarCodigo(campo) {
+    return marcar(campo, !/^[A-Z0-9]{16}$/i.test(campo.value.trim()), "Informe os 16 caracteres do código recebido.");
+  }
+
   /* ---------- cabeçalho (usuário logado e sair) ---------- */
+  var URL_FOTO = "api/perfil/foto";
+  var versaoFoto = "";
+  function mostrarAvatar(el, iniciais, aoCarregar, semFoto) {
+    if (!el) return;
+    el.textContent = iniciais || "";
+    if (semFoto) return;
+    var foto = document.createElement("img");
+    foto.className = "imagem-avatar";
+    foto.setAttribute("alt", "");
+    foto.setAttribute("hidden", "");
+    foto.addEventListener("load", function () {
+      if ($("img", el) !== foto) return;
+      foto.removeAttribute("hidden");
+      if (aoCarregar) aoCarregar();
+    });
+    foto.addEventListener("error", function () {
+      if ($("img", el) === foto) el.textContent = iniciais || "";
+    });
+    el.appendChild(foto);
+    foto.setAttribute("src", URL_FOTO + versaoFoto);
+  }
   function mostrarUsuario(u) {
-    var av = $("#avatar"); if (av) av.textContent = u.iniciais;
+    mostrarAvatar($("#avatar"), u.iniciais);
     var nm = $("#nome-usuario"); if (nm) nm.textContent = u.nomeExibicao;
   }
   function carregarUsuario() {
@@ -193,11 +246,6 @@
   telas.login = function () {
     ativarMostrarSenha();
     api("GET", "api/me").then(function (r) { if (r.ok) window.location.href = "painel.html"; });
-    var esqueci = $("#esqueci");
-    if (esqueci) esqueci.addEventListener("click", function (ev) {
-      ev.preventDefault();
-      mostrarMensagem($("#mensagem"), "aviso", "A recuperação de senha por e-mail ainda não está disponível nesta versão.");
-    });
     $("#form-login").addEventListener("submit", function (ev) {
       ev.preventDefault();
       var email = $("#email"), senha = $("#senha");
@@ -456,16 +504,170 @@
     });
   };
 
+  function ativarFotoPerfil(iniciais) {
+    var form = $("#form-foto"), campo = $("#arquivo-foto"), mensagem = $("#mensagem-foto");
+    var remover = $("#remover-foto");
+
+    function desenhar(semFoto) {
+      remover.setAttribute("hidden", "");
+      mostrarAvatar($("#avatar-grande"), iniciais(), function () {
+        remover.removeAttribute("hidden");
+      }, semFoto);
+    }
+    function atualizar(metodo, dados, tipo) {
+      aguardarEnvio(form, api(metodo, URL_FOTO, dados, tipo).then(function (r) {
+        if (exigirLogin(r)) return;
+        if (!r.ok) {
+          mostrarMensagem(mensagem, "falha", erroResposta(r, "Não foi possível atualizar a foto."));
+          return;
+        }
+        var removida = metodo === "DELETE";
+        versaoFoto = "?v=" + Date.now();
+        campo.value = "";
+        marcar(campo, false);
+        desenhar(removida);
+        mostrarAvatar($("#avatar"), iniciais(), null, removida);
+        mostrarMensagem(mensagem, "sucesso", r.corpo.mensagem || (removida ? "Foto removida." : "Foto atualizada."));
+        return removida;
+      })).then(function (removida) {
+        if (removida) campo.focus();
+      });
+    }
+    aoEnviar(form, function () {
+      var arquivo = campo.files && campo.files[0];
+      var erro = "";
+      if (!arquivo) erro = "Escolha uma imagem.";
+      else if (arquivo.type !== "image/jpeg" && arquivo.type !== "image/png") erro = "Escolha um arquivo JPG ou PNG.";
+      else if (!arquivo.size || arquivo.size > 2 * 1024 * 1024) erro = "Escolha uma imagem de até 2 MB.";
+      if (!marcar(campo, !!erro, erro)) {
+        anunciarValidacao(form, mensagem);
+        return;
+      }
+      atualizar("POST", arquivo, arquivo.type);
+    });
+    remover.addEventListener("click", function () {
+      if (!ocupado(form) && remover.getAttribute("hidden") === null) atualizar("DELETE");
+    });
+    return desenhar;
+  }
+
+  function ativarAlteracaoEmail(atualizarEmail) {
+    var solicitar = $("#form-email-solicitar"), confirmar = $("#form-email-confirmar");
+    var email = $("#novo-email"), senha = $("#senha-atual"), codigo = $("#codigo-email");
+    var mensagem = $("#mensagem-email");
+
+    aoEnviar(solicitar, function () {
+      var valido = validarEmail(email);
+      valido = marcar(senha, !senha.value, "Informe sua senha atual.") && valido;
+      if (!valido) { anunciarValidacao(solicitar, mensagem); return; }
+      var resposta = api("POST", "api/conta/email/solicitar", { email: email.value.trim(), senha: senha.value });
+      senha.value = "";
+      aguardarEnvio(solicitar, resposta.then(function (r) {
+        if (exigirLogin(r)) return;
+        if (!r.ok) {
+          mostrarMensagem(mensagem, "falha", erroResposta(r, "Não foi possível solicitar o código."));
+          return;
+        }
+        mostrarMensagem(mensagem, "sucesso", r.corpo.mensagem || "Confira o código no seu e-mail atual.");
+        alternarFormulario(solicitar, confirmar, codigo);
+      }));
+    });
+    aoEnviar(confirmar, function () {
+      if (!validarCodigo(codigo)) { anunciarValidacao(confirmar, mensagem); return; }
+      aguardarEnvio(confirmar, api("POST", "api/conta/email/confirmar", { codigo: codigo.value.trim() }).then(function (r) {
+        if (exigirLogin(r)) return;
+        if (!r.ok) {
+          mostrarMensagem(mensagem, "falha", erroResposta(r, "Não foi possível confirmar a alteração."));
+          return;
+        }
+        atualizarEmail(r.corpo.usuario.email);
+        solicitar.reset();
+        confirmar.reset();
+        alternarFormulario(confirmar, solicitar, email);
+        mostrarMensagem(mensagem, "sucesso", r.corpo.mensagem || "E-mail atualizado.");
+      }));
+    });
+    $("#ja-tenho-codigo-email").addEventListener("click", function () {
+      if (ocupado(solicitar)) return;
+      senha.value = "";
+      alternarFormulario(solicitar, confirmar, codigo);
+    });
+    $("#voltar-email").addEventListener("click", function () {
+      if (ocupado(confirmar)) return;
+      confirmar.reset();
+      marcar(codigo, false);
+      alternarFormulario(confirmar, solicitar, email);
+    });
+  }
+
+  telas["recuperar-senha"] = function () {
+    var solicitar = $("#form-recuperacao-solicitar"), confirmar = $("#form-recuperacao-confirmar");
+    var email = $("#email-recuperacao"), emailConfirmacao = $("#email-confirmacao");
+    var codigo = $("#codigo-recuperacao"), senha = $("#senha-nova"), repeticao = $("#confirmar-senha-nova");
+    var mensagem = $("#mensagem-recuperacao");
+
+    function mostrarConfirmacao(endereco) {
+      emailConfirmacao.value = endereco;
+      alternarFormulario(solicitar, confirmar, codigo);
+    }
+    aoEnviar(solicitar, function () {
+      if (!validarEmail(email)) { anunciarValidacao(solicitar, mensagem); return; }
+      var endereco = email.value.trim();
+      aguardarEnvio(solicitar, api("POST", "api/conta/senha/solicitar", { email: endereco }).then(function (r) {
+        if (!r.ok) {
+          mostrarMensagem(mensagem, "falha", erroResposta(r, "Não foi possível solicitar o código."));
+          return;
+        }
+        mostrarMensagem(mensagem, "sucesso", r.corpo.mensagem || "Se o e-mail estiver cadastrado, você receberá um código.");
+        mostrarConfirmacao(endereco);
+      }));
+    });
+    aoEnviar(confirmar, function () {
+      var valido = validarCodigo(codigo);
+      valido = marcar(senha, senha.value.length < 8 || senha.value.length > 72, "Use de 8 a 72 caracteres.") && valido;
+      valido = marcar(repeticao, !repeticao.value || repeticao.value !== senha.value, "As senhas precisam ser iguais.") && valido;
+      if (!valido) { anunciarValidacao(confirmar, mensagem); return; }
+      aguardarEnvio(confirmar, api("POST", "api/conta/senha/confirmar", {
+        email: emailConfirmacao.value, codigo: codigo.value.trim(), senha: senha.value, confirmar: repeticao.value
+      }).then(function (r) {
+        if (!r.ok) {
+          mostrarMensagem(mensagem, "falha", erroResposta(r, "Não foi possível redefinir a senha."));
+          return;
+        }
+        confirmar.reset();
+        solicitar.reset();
+        confirmar.setAttribute("hidden", "");
+        mostrarMensagem(mensagem, "sucesso", r.corpo.mensagem || "Senha redefinida.");
+        var login = $("#voltar-login");
+        login.textContent = "Entrar com a nova senha";
+        login.focus();
+      }));
+    });
+    $("#ja-tenho-codigo-senha").addEventListener("click", function () {
+      if (ocupado(solicitar)) return;
+      if (!validarEmail(email)) { anunciarValidacao(solicitar, mensagem); return; }
+      mostrarConfirmacao(email.value.trim());
+    });
+    $("#voltar-recuperacao").addEventListener("click", function () {
+      if (ocupado(confirmar)) return;
+      confirmar.reset();
+      [codigo, senha, repeticao].forEach(function (campo) { marcar(campo, false); });
+      alternarFormulario(confirmar, solicitar, email);
+    });
+  };
+
   telas.perfil = function () {
     var usuario = null;
+    var emailAtualizado = false;
+    var desenharFoto = ativarFotoPerfil(function () { return usuario && usuario.iniciais; });
     function preencher(u) {
       usuario = u;
       $("#nome-exibicao").value = u.nomeExibicao;
       $("#nome-completo").value = u.nome;
       $("#modo-preferido").value = u.modoPreferido;
       $("#sobre").value = u.sobre;
-      $("#email-atual").textContent = u.email;
-      $("#avatar-grande").textContent = u.iniciais;
+      if (!emailAtualizado) $("#email-atual").textContent = u.email;
+      desenharFoto();
     }
     function carregarPerfil() {
       api("GET", "api/perfil").then(function (r) {
@@ -503,17 +705,15 @@
         mostrarMensagem($("#mensagem-perfil"), "falha", e.sobre || e.modoPreferido || r.corpo.erro || "Não foi possível salvar.");
       });
     });
-    $("#alterar-email").addEventListener("click", function () {
-      mostrarMensagem($("#mensagem-email"), "aviso", "A alteração de e-mail depende do envio de mensagens e ainda não está disponível nesta versão.");
-    });
-    $("#redefinir-senha").addEventListener("click", function () {
-      mostrarMensagem($("#mensagem-senha"), "aviso", "A redefinição de senha depende do envio de mensagens e ainda não está disponível nesta versão.");
+    ativarAlteracaoEmail(function (email) {
+      emailAtualizado = true;
+      $("#email-atual").textContent = email;
     });
   };
 
   document.addEventListener("DOMContentLoaded", function () {
     var tela = document.body.getAttribute("data-tela");
-    if (tela !== "login" && tela !== "cadastro") {
+    if (tela !== "login" && tela !== "cadastro" && tela !== "recuperar-senha") {
       ativarSair();
       carregarUsuario();
     }

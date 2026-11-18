@@ -41,7 +41,8 @@ for (const file of fs.readdirSync(web).filter(name => name.endsWith('.html')).so
 for (const [file, controls] of [
   ['index.html', ['email', 'senha']],
   ['cadastro.html', ['nome', 'email', 'senha', 'confirmar']],
-  ['perfil.html', ['nome-exibicao']],
+  ['perfil.html', ['nome-exibicao', 'arquivo-foto', 'novo-email', 'senha-atual', 'codigo-email']],
+  ['recuperar-senha.html', ['email-recuperacao', 'codigo-recuperacao', 'senha-nova', 'confirmar-senha-nova']],
   ['registrar-partida.html', ['adversario']]
 ]) {
   test(`HTML ${file}: erros de validação estão associados aos campos`, () => {

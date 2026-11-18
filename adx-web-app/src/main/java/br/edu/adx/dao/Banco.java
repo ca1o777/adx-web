@@ -50,7 +50,19 @@ public final class Banco {
               CONSTRAINT ck_partidas_modo CHECK (modo IN ('Clássico', 'Rápido', 'Blitz')),
               CONSTRAINT ck_partidas_resultado CHECK (resultado IN ('Vitória', 'Empate', 'Derrota'))
             )""",
-            "CREATE INDEX IF NOT EXISTS idx_partidas_usuario ON partidas (usuario_id, data_hora)"
+            "CREATE INDEX IF NOT EXISTS idx_partidas_usuario ON partidas (usuario_id, data_hora)",
+            "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS versao_credencial BIGINT NOT NULL DEFAULT 0",
+            """
+            CREATE TABLE IF NOT EXISTS codigos_conta (
+              usuario_id  BIGINT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+              finalidade  VARCHAR(5) NOT NULL CHECK (finalidade IN ('EMAIL', 'SENHA')),
+              codigo_hash BINARY(32) NOT NULL,
+              novo_email  VARCHAR(120),
+              enviado_em  TIMESTAMP WITH TIME ZONE NOT NULL,
+              expira_em   TIMESTAMP WITH TIME ZONE NOT NULL,
+              tentativas  INT NOT NULL DEFAULT 0,
+              PRIMARY KEY (usuario_id, finalidade)
+            )"""
         };
         try (Connection c = conexao(); Statement st = c.createStatement()) {
             for (String sql : comandos) {

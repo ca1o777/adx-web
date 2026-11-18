@@ -138,6 +138,11 @@ a:hover { color: var(--ouro-escuro); }
 .botao-secundario:hover { background: var(--nogueira); color: #FFFFFF; }
 .botao-largo { width: 100%; }
 .acoes { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+.botao:disabled, .botao-texto:disabled { opacity: .55; cursor: wait; }
+.botao-texto {
+  padding: 4px 0; border: 0; background: none; color: var(--nogueira);
+  font: 600 15px var(--fonte-texto); text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
 
 /* ---------- Formulários ---------- */
 .campo { display: grid; gap: 6px; margin-bottom: 18px; }
@@ -268,9 +273,19 @@ fieldset.campo { border: 0; margin: 0 0 18px; padding: 0; min-width: 0; }
   display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%;
   background: var(--ouro); color: var(--nogueira); font-family: var(--fonte-titulo); font-size: 34px; font-weight: 700;
 }
+.avatar, .avatar-grande { position: relative; overflow: hidden; flex: none; }
+.imagem-avatar { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: var(--ouro); }
+.foto-controles { min-width: 0; flex: 1; }
+.foto-controles .campo { margin-bottom: 8px; }
+.foto-controles .acoes, .detalhes-conta .acoes { flex-wrap: wrap; }
 .foto-perfil .botao { height: 40px; padding: 0 16px; }
+.detalhes-conta { margin-top: 12px; }
+.detalhes-conta summary { color: var(--nogueira); font-weight: 700; cursor: pointer; }
+.detalhes-conta > p { margin: 12px 0; }
+.detalhes-conta form { margin-top: 12px; }
+[hidden] { display: none !important; }
 .painel p + .acoes { margin-top: 14px; }
-.valor-destaque { font-size: 17px; font-weight: 600; color: var(--nogueira); margin-bottom: 4px; }
+.valor-destaque { font-size: 17px; font-weight: 600; color: var(--nogueira); margin-bottom: 4px; overflow-wrap: anywhere; }
 
 /* ---------- Telas de acesso (login e cadastro) ---------- */
 .acesso { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
@@ -319,6 +334,10 @@ fieldset.campo { border: 0; margin: 0 0 18px; padding: 0; min-width: 0; }
   .placar div:nth-child(3) { padding-left: 0; border-left: 0; }
   .dados { grid-template-columns: 1fr; }
 }
+@media (max-width: 440px) {
+  .foto-perfil { flex-wrap: wrap; }
+  .foto-controles { flex: 1 0 100%; }
+}
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
@@ -328,4 +347,3 @@ fieldset.campo { border: 0; margin: 0 0 18px; padding: 0; min-width: 0; }
 .espaco-pequeno { margin-top: 12px; }
 .planilha .col-pos { width: 96px; color: var(--texto-suave); }
 .painel > h2 + .mensagem.visivel { margin-top: 12px; margin-bottom: 0; }
-.legenda-foto { margin-top: 6px; font-size: 14px; color: var(--texto-suave); }

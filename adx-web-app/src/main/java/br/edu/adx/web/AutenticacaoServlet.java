@@ -18,6 +18,7 @@ import java.util.Map;
 
 /** UC01 (cadastro) e UC02 (login, logout e sessão). Regras RN001 e RN003. */
 public class AutenticacaoServlet extends ApiServlet {
+    public static final String VERSAO_CREDENCIAL = "versaoCredencial";
     private static final String CREDENCIAIS_INVALIDAS = "E-mail ou senha incorretos.";
     private final UsuarioDao usuarios = new UsuarioDao();
 
@@ -130,6 +131,7 @@ public class AutenticacaoServlet extends ApiServlet {
         }
         HttpSession sessao = req.getSession(true);
         sessao.setAttribute(USUARIO, tentativa.usuarioId());
+        sessao.setAttribute(VERSAO_CREDENCIAL, tentativa.versaoCredencial());
         sessao.setMaxInactiveInterval(Regras.SESSAO_DIAS * 24 * 60 * 60);
         json(resp, 200, Map.of("usuario", mapa(usuarios.porId(tentativa.usuarioId()).orElseThrow())));
     }

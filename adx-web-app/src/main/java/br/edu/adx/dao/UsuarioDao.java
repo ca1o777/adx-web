@@ -24,7 +24,8 @@ public class UsuarioDao {
     public record Credencial(long id, String hash, int falhas, LocalDateTime bloqueadoAte) { }
 
     /** Resultado persistido da tentativa: autorizado, senha incorreta ou bloqueio até a data indicada. */
-    public record Autenticacao(long usuarioId, boolean autorizado, LocalDateTime bloqueadoAte) { }
+    public record Autenticacao(long usuarioId, boolean autorizado, LocalDateTime bloqueadoAte,
+                               long versaoCredencial) { }
 
     public long inserir(String nome, String email, String hash, String nomeExibicao) {
         String sql = "INSERT INTO usuarios (nome, email, senha_hash, nome_exibicao, criado_em) VALUES (?, ?, ?, ?, ?)";
@@ -91,17 +92,31 @@ public class UsuarioDao {
      * O chamador fornece o verificador para manter o algoritmo de senha fora do DAO.
      */
     public Optional<Autenticacao> autenticar(String email, Predicate<String> conferirSenha) {
-        String sql = "SELECT id, senha_hash, falhas_login, bloqueado_ate FROM usuarios WHERE email = ? FOR UPDATE";
+        return autenticar("email = ?", new Object[] {email}, conferirSenha);
+    }
+
+    /** Reconfirma a senha em uma sessão vigente e aplica o mesmo limite de tentativas do login. */
+    public Optional<Autenticacao> reautenticar(long id, long versao, Predicate<String> conferirSenha) {
+        return autenticar("id = ? AND versao_credencial = ?", new Object[] {id, versao}, conferirSenha);
+    }
+
+    private Optional<Autenticacao> autenticar(String filtro, Object[] parametros, Predicate<String> conferirSenha) {
+        String sql = "SELECT id, senha_hash, falhas_login, bloqueado_ate, versao_credencial FROM usuarios WHERE "
+                + filtro + " FOR UPDATE";
         try (Connection c = Banco.conexao()) {
             c.setAutoCommit(false);
             try {
                 Credencial cred = null;
+                long versao = 0;
                 try (PreparedStatement ps = c.prepareStatement(sql)) {
-                    ps.setString(1, email);
+                    for (int i = 0; i < parametros.length; i++) {
+                        ps.setObject(i + 1, parametros[i]);
+                    }
                     try (ResultSet rs = ps.executeQuery()) {
                         if (rs.next()) {
                             cred = new Credencial(rs.getLong(1), rs.getString(2), rs.getInt(3),
                                     rs.getObject(4, LocalDateTime.class));
+                            versao = rs.getLong(5);
                         }
                     }
                 }
@@ -114,7 +129,7 @@ public class UsuarioDao {
                 LocalDateTime agora = Formatos.agora();
                 if (cred.bloqueadoAte() != null && cred.bloqueadoAte().isAfter(agora)) {
                     c.commit();
-                    return Optional.of(new Autenticacao(cred.id(), false, cred.bloqueadoAte()));
+                    return Optional.of(new Autenticacao(cred.id(), false, cred.bloqueadoAte(), versao));
                 }
 
                 boolean autorizado = conferirSenha.test(cred.hash());
@@ -132,7 +147,7 @@ public class UsuarioDao {
                     ps.executeUpdate();
                 }
                 c.commit();
-                return Optional.of(new Autenticacao(cred.id(), autorizado, bloqueadoAte));
+                return Optional.of(new Autenticacao(cred.id(), autorizado, bloqueadoAte, versao));
             } catch (SQLException | RuntimeException e) {
                 try {
                     c.rollback();
@@ -140,6 +155,19 @@ public class UsuarioDao {
                     e.addSuppressed(rollback);
                 }
                 throw e;
+            }
+        } catch (SQLException e) {
+            throw new ErroBanco(e);
+        }
+    }
+
+    public boolean sessaoAtual(long id, long versao) {
+        String sql = "SELECT 1 FROM usuarios WHERE id = ? AND versao_credencial = ?";
+        try (Connection c = Banco.conexao(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            ps.setLong(2, versao);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
             }
         } catch (SQLException e) {
             throw new ErroBanco(e);

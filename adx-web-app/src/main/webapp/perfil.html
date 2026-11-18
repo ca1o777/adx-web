@@ -23,10 +23,22 @@
       <section class="painel">
         <div class="painel-titulo"><h2>Dados do perfil</h2></div>
         <div class="mensagem" id="mensagem-perfil" role="status" aria-live="polite" aria-atomic="true"></div>
-        <div class="foto-perfil">
+        <div class="mensagem" id="mensagem-foto" role="status" aria-live="polite" aria-atomic="true"></div>
+        <form class="foto-perfil" id="form-foto" novalidate>
           <div class="avatar-grande" id="avatar-grande" aria-hidden="true"></div>
-          <div><button class="botao botao-secundario" type="button" disabled title="Disponível em uma próxima versão">Alterar foto</button><p class="legenda-foto">JPG ou PNG com até 2 MB.</p></div>
-        </div>
+          <div class="foto-controles">
+            <div class="campo">
+              <label for="arquivo-foto">Foto de perfil</label>
+              <input id="arquivo-foto" type="file" accept="image/jpeg,image/png" required aria-describedby="foto-ajuda arquivo-foto-erro">
+              <span class="ajuda" id="foto-ajuda">JPG ou PNG de até 2 MB e 2.048 pixels por lado.</span>
+              <span class="erro" id="arquivo-foto-erro"></span>
+            </div>
+            <div class="acoes">
+              <button class="botao botao-secundario" type="submit">Salvar foto</button>
+              <button class="botao botao-secundario" id="remover-foto" type="button" hidden>Remover foto</button>
+            </div>
+          </div>
+        </form>
         <form id="form-perfil" novalidate>
           <div class="campo"><label for="nome-exibicao">Nome de exibição</label><input id="nome-exibicao" type="text" aria-describedby="nome-exibicao-ajuda nome-exibicao-erro" required><span class="ajuda" id="nome-exibicao-ajuda">É assim que você aparece no ranking.</span><span class="erro" id="nome-exibicao-erro"></span></div>
           <div class="campo"><label for="nome-completo">Nome completo</label><input id="nome-completo" type="text" aria-describedby="nome-completo-ajuda" readonly><span class="ajuda" id="nome-completo-ajuda">Informado no cadastro.</span></div>
@@ -41,19 +53,46 @@
           <h2>E-mail de acesso</h2>
           <div class="mensagem" id="mensagem-email" role="status" aria-live="polite" aria-atomic="true"></div>
           <p class="valor-destaque espaco-pequeno" id="email-atual"></p>
-          <p class="suave">Para alterar, enviamos um código de confirmação ao e-mail atual.</p>
-          <div class="acoes"><button class="botao botao-secundario" id="alterar-email" type="button">Alterar e-mail</button></div>
+          <details class="detalhes-conta">
+            <summary id="alterar-email">Alterar e-mail</summary>
+            <p class="suave">O código de confirmação será enviado ao e-mail atual.</p>
+            <form id="form-email-solicitar" novalidate>
+              <div class="campo">
+                <label for="novo-email">Novo e-mail</label>
+                <input id="novo-email" type="email" autocomplete="email" maxlength="120" aria-describedby="novo-email-erro" required>
+                <span class="erro" id="novo-email-erro"></span>
+              </div>
+              <div class="campo">
+                <label for="senha-atual">Senha atual</label>
+                <input id="senha-atual" type="password" autocomplete="current-password" maxlength="72" aria-describedby="senha-atual-erro" required>
+                <span class="erro" id="senha-atual-erro"></span>
+              </div>
+              <div class="acoes">
+                <button class="botao botao-secundario" type="submit">Enviar código</button>
+                <button class="botao-texto" id="ja-tenho-codigo-email" type="button">Já tenho um código</button>
+              </div>
+            </form>
+            <form id="form-email-confirmar" novalidate hidden>
+              <div class="campo">
+                <label for="codigo-email">Código de confirmação</label>
+                <input id="codigo-email" type="text" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" maxlength="24" aria-describedby="codigo-email-erro" required>
+                <span class="erro" id="codigo-email-erro"></span>
+              </div>
+              <div class="acoes">
+                <button class="botao botao-primario" type="submit">Confirmar alteração</button>
+                <button class="botao-texto" id="voltar-email" type="button">Solicitar outro código</button>
+              </div>
+            </form>
+          </details>
         </section>
         <section class="painel">
           <h2>Senha</h2>
-          <div class="mensagem" id="mensagem-senha" role="status" aria-live="polite" aria-atomic="true"></div>
-          <p class="suave espaco-pequeno">Enviamos um link de redefinição para o e-mail cadastrado.</p>
-          <div class="acoes"><button class="botao botao-secundario" id="redefinir-senha" type="button">Redefinir senha</button></div>
+          <p class="suave espaco-pequeno">Use um código enviado ao e-mail cadastrado para definir outra senha.</p>
+          <div class="acoes"><a class="botao botao-secundario" id="redefinir-senha" href="recuperar-senha.html">Redefinir senha</a></div>
         </section>
         <section class="painel">
           <h2>Excluir conta</h2>
-          <p class="suave espaco-pequeno">A exclusão da conta é feita pelo suporte do ADX, a pedido do jogador.</p>
-          <div class="acoes"><a class="botao botao-secundario" href="mailto:suporte@adx.exemplo.com">Falar com o suporte</a></div>
+          <p class="suave espaco-pequeno">O ADX não oferece exclusão de conta pelo jogador.</p>
         </section>
       </div>
     </div>

@@ -17,3 +17,7 @@ Se estiver no PowerShell, abra-o na pasta adx-web-app e digite:
 
 Use executar-demo.bat para iniciar com jogadores ficticios num banco vazio.
 Use executar-testes.bat para rodar os testes (requer tambem Python e Node.js).
+
+Para demonstrar a confirmacao de e-mail e a recuperacao de senha, siga
+a secao "E-mails de confirmacao" do README.md. Para usar um banco de uma
+versao anterior, guarde uma copia da pasta data com o servidor encerrado.
