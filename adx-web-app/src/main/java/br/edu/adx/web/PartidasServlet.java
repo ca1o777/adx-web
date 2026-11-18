@@ -28,6 +28,8 @@ public class PartidasServlet extends ApiServlet {
         String info = req.getPathInfo();
         if (info == null || info.equals("/")) {
             listar(req, resp, uid);
+        } else if (info.equals("/adversarios")) {
+            json(resp, 200, Map.of("adversarios", partidas.adversarios(uid)));
         } else {
             detalhar(info.substring(1), resp, uid);
         }

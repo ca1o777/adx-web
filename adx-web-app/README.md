@@ -113,6 +113,7 @@ Todas as rotas respondem JSON. Rotas que alteram dados exigem o cabeçalho `X-Re
 | GET | `/api/me` | Jogador da sessão | UC02 |
 | GET | `/api/painel` | Estatísticas, posição e últimas partidas | RN002 |
 | GET | `/api/partidas?busca=&modo=&resultado=&pagina=` | Histórico com filtros | UC04 · RN002 |
+| GET | `/api/partidas/adversarios` | Listar jogadores cadastrados e adversários do próprio histórico | UC04 · RN004 |
 | POST | `/api/partidas` | Registrar partida | UC04 · RN004 |
 | GET | `/api/partidas/{id}` | Detalhes e retrospecto | UC03 |
 | DELETE/PUT | `/api/partidas/{id}` | Sempre recusado (HTTP 405) | RN002 · RN004 |
@@ -129,7 +130,7 @@ Todas as rotas respondem JSON. Rotas que alteram dados exigem o cabeçalho `X-Re
 - **RN001** – nome e sobrenome, e-mail válido e único (maiúsculas ignoradas), senha com no mínimo 8 caracteres.
 - **RN002** – estatísticas e ranking calculados pelo servidor a partir do histórico; partidas não podem ser excluídas.
 - **RN003** – visitantes podem acessar login, cadastro e recuperação de senha. Três senhas incorretas bloqueiam o acesso por 15 minutos. A sessão permanece válida no servidor por até 30 dias de inatividade.
-- **RN004** – partida exige adversário, modo e resultado; a data é gerada pelo servidor (horário de Brasília).
+- **RN004** – Ao registrar uma partida, o jogador escolhe o adversário na lista ou usa **Digitar outro nome**. A lista inclui os nomes de exibição dos demais jogadores cadastrados e os adversários do seu histórico. O jogador informa o modo e o resultado. O servidor registra a data e a hora de Brasília.
 - **RN005** – o jogador altera nome de exibição, modo preferido, apresentação e foto. O e-mail só muda após confirmação pelo endereço anterior. A redefinição da senha exige o código recebido no endereço cadastrado. A exclusão de conta não é oferecida na interface.
 
 ## Segurança

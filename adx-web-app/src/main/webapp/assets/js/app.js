@@ -342,6 +342,57 @@
   };
 
   telas.registrar = function () {
+    var lista = $("#adversario-lista"), nomeManual = $("#adversario"), campoManual = $("#adversario-manual");
+    var grupo = $("#adversarios-disponiveis"), aviso = $("#adversarios-aviso");
+    var digitarNome = "!", nomes = new Map();
+
+    function exibirCampoManual() {
+      nomeManual.disabled = lista.value !== digitarNome;
+      if (nomeManual.disabled) campoManual.setAttribute("hidden", "");
+      else campoManual.removeAttribute("hidden");
+      marcar(lista, false);
+      marcar(nomeManual, false);
+    }
+    lista.addEventListener("change", function () {
+      exibirCampoManual();
+      if (!nomeManual.disabled) nomeManual.focus();
+    });
+
+    function incluirNomes(novos) {
+      var selecionado = lista.value;
+      novos.forEach(function (nome) {
+        var chave = nome.toLocaleLowerCase("pt-BR");
+        if (!nomes.has(chave)) nomes.set(chave, nome);
+      });
+      grupo.textContent = "";
+      Array.from(nomes.values()).sort(function (a, b) {
+        return a.localeCompare(b, "pt-BR");
+      }).forEach(function (nome) {
+        var opcao = document.createElement("option");
+        opcao.value = nome;
+        opcao.textContent = nome;
+        grupo.appendChild(opcao);
+      });
+      if (nomes.size) grupo.removeAttribute("hidden");
+      lista.value = selecionado;
+    }
+
+    api("GET", "api/partidas/adversarios").then(function (r) {
+      if (exigirLogin(r)) return;
+      var carregou = r.ok && Array.isArray(r.corpo.adversarios);
+      if (carregou) incluirNomes(r.corpo.adversarios);
+      if (nomes.size) {
+        aviso.textContent = "";
+      } else {
+        aviso.textContent = carregou ? "Ainda não há adversários na lista. Digite um nome." :
+          "A lista está indisponível. Você pode digitar o nome.";
+        if (!lista.value) {
+          lista.value = digitarNome;
+          exibirCampoManual();
+        }
+      }
+    });
+
     function atualizarData() {
       var data = $("#data");
       if (data) {
@@ -371,10 +422,10 @@
 
     $("#form-partida").addEventListener("submit", function (ev) {
       ev.preventDefault();
-      var adv = $("#adversario");
+      var adv = lista.value === digitarNome ? nomeManual : lista;
       var modo = $('input[name="modo"]:checked');
       var res = $('input[name="resultado"]:checked');
-      var ok = marcar(adv, adv.value.trim().length < 2, "Informe o nome do adversário.");
+      var ok = marcar(adv, adv.value.trim().length < 2, adv === lista ? "Selecione um adversário." : "Informe o nome do adversário.");
       marcarGrupo("#grupo-modo", !modo, "Escolha o modo de jogo.");
       marcarGrupo("#grupo-resultado", !res, "Escolha o resultado da partida.");
       if (!ok || !modo || !res) { anunciarValidacao(ev.target, $("#mensagem")); return; }
@@ -388,7 +439,12 @@
           if (r.ok) {
             mostrarMensagem($("#mensagem"), "sucesso",
               "Partida registrada em " + r.corpo.partida.registradaEm + ". Ela já aparece no seu histórico.");
+            if (adv === nomeManual) {
+              incluirNomes([r.corpo.partida.adversario]);
+              aviso.textContent = "";
+            }
             ev.target.reset();
+            exibirCampoManual();
             atualizarData();
             carregarRecentes();
             return;

@@ -24,8 +24,18 @@
         <div class="mensagem" id="mensagem" role="status" aria-live="polite" aria-atomic="true"></div>
         <form id="form-partida" novalidate>
           <div class="campo">
-            <label for="adversario">Adversário</label>
-            <input id="adversario" name="adversario" type="text" autocomplete="off" placeholder="Nome do seu adversário" aria-describedby="adversario-erro" required>
+            <label for="adversario-lista">Adversário</label>
+            <select id="adversario-lista" aria-describedby="adversarios-aviso adversario-lista-erro" required>
+              <option value="">Selecione o adversário</option>
+              <optgroup id="adversarios-disponiveis" label="Adversários disponíveis" hidden></optgroup>
+              <option value="!">Digitar outro nome</option>
+            </select>
+            <span class="ajuda" id="adversarios-aviso" role="status">Carregando adversários…</span>
+            <span class="erro" id="adversario-lista-erro"></span>
+          </div>
+          <div class="campo" id="adversario-manual" hidden>
+            <label for="adversario">Nome do adversário</label>
+            <input id="adversario" name="adversario" type="text" autocomplete="off" maxlength="60" aria-describedby="adversario-erro" disabled required>
             <span class="erro" id="adversario-erro"></span>
           </div>
           <fieldset class="campo" id="grupo-modo" aria-describedby="grupo-modo-erro">

@@ -43,7 +43,7 @@ for (const [file, controls] of [
   ['cadastro.html', ['nome', 'email', 'senha', 'confirmar']],
   ['perfil.html', ['nome-exibicao', 'arquivo-foto', 'novo-email', 'senha-atual', 'codigo-email']],
   ['recuperar-senha.html', ['email-recuperacao', 'codigo-recuperacao', 'senha-nova', 'confirmar-senha-nova']],
-  ['registrar-partida.html', ['adversario']]
+  ['registrar-partida.html', ['adversario-lista', 'adversario']]
 ]) {
   test(`HTML ${file}: erros de validação estão associados aos campos`, () => {
     const nodes = elements(file);

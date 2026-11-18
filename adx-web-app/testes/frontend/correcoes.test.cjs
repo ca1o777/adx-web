@@ -137,6 +137,9 @@ test('acessibilidade: login associa erros, anuncia validação e foca primeiro c
 test('acessibilidade: grupos de opções ligam erro aos radios e recebem foco', async () => {
   const app = createApp('registrar');
   app.request('api/partidas?').respond(historyPage([]));
+  app.node('adversario-lista').value = '!';
+  app.node('adversario-lista').dispatch('change');
+  assert.equal(app.document.activeElement, app.node('adversario'));
   app.node('adversario').value = 'Bruno Reis';
   app.node('form-partida').dispatch('submit');
   for (const id of ['grupo-modo', 'grupo-resultado']) {

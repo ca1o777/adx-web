@@ -126,6 +126,24 @@ class DaoIntegrationTest {
     }
 
     @Test
+    void listaOutrosJogadoresEAdversariosDoProprioHistoricoSemRepetirNomes() {
+        usuarios.inserir("Álvaro Ribeiro", "alvaro@example.com", "hash", "Álvaro");
+        usuarios.inserir("Bia de Souza", "bia@example.com", "hash", "Bia");
+        inserir(ana, "ÁLVARO", "Blitz", "Vitória");
+        inserir(ana, "Carlos", "Blitz", "Empate");
+        inserir(ana, "Carlos", "Rápido", "Vitória");
+        inserir(outro, "Adversário particular", "Blitz", "Derrota");
+
+        assertEquals(List.of("Álvaro", "Bia", "Carlos", "Outro"), partidas.adversarios(ana));
+    }
+
+    @Test
+    void adversarioComMesmoNomeDoJogadorPodeSerSelecionado() {
+        usuarios.inserir("Ana do Clube", "homonima@example.com", "hash", "Ana");
+        assertEquals(List.of("Ana", "Outro"), partidas.adversarios(ana));
+    }
+
+    @Test
     void partidasEConsultasFicamIsoladasPorUsuario() {
         long minha = inserir(ana, "Mesmo Adversário", "Blitz", "Vitória");
         long alheia = inserir(outro, "Mesmo Adversário", "Blitz", "Derrota");

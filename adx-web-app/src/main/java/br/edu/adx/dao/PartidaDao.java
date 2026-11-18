@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.Collator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,6 +94,33 @@ public class PartidaDao {
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? Optional.of(mapear(rs)) : Optional.empty();
             }
+        } catch (SQLException e) {
+            throw new ErroBanco(e);
+        }
+    }
+
+    /** Nomes para o registro de partidas: jogadores cadastrados e adversários do próprio histórico. */
+    public List<String> adversarios(long usuarioId) {
+        String sql = """
+            SELECT COALESCE(MIN(CASE WHEN cadastrado THEN nome END), MIN(nome))
+            FROM (
+                SELECT nome_exibicao AS nome, TRUE AS cadastrado FROM usuarios WHERE id <> ?
+                UNION ALL
+                SELECT adversario, FALSE FROM partidas WHERE usuario_id = ?
+            ) candidatos
+            GROUP BY LOWER(nome)
+            """;
+        try (Connection c = Banco.conexao(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, usuarioId);
+            ps.setLong(2, usuarioId);
+            List<String> nomes = new ArrayList<>();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    nomes.add(rs.getString(1));
+                }
+            }
+            nomes.sort(Collator.getInstance(Locale.forLanguageTag("pt-BR")));
+            return nomes;
         } catch (SQLException e) {
             throw new ErroBanco(e);
         }

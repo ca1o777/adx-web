@@ -21,8 +21,11 @@ function validSignup(app) {
   app.node('senha').value = 'Senha123!';
   app.node('confirmar').value = 'Senha123!';
 }
-function validGame(app) {
-  app.node('adversario').value = ' Bruno Reis ';
+function validGame(app, adversario = '!') {
+  const lista = app.node('adversario-lista');
+  lista.value = adversario;
+  lista.dispatch('change');
+  if (adversario === '!') app.node('adversario').value = ' Bruno Reis ';
   const mode = app.document.querySelector('input[name="modo"][value="Blitz"]');
   const result = app.document.querySelector('input[name="resultado"][value="Vitória"]');
   assert.ok(mode && result, 'As opções esperadas precisam existir no HTML real');
@@ -384,7 +387,7 @@ test('registro: campos ausentes impedem envio de partida', async () => {
   app.node('form-partida').dispatch('submit');
   await settle();
   assert.equal(app.requests.filter(request => request.init.method === 'POST').length, 0);
-  assert.equal(app.node('adversario').getAttribute('aria-invalid'), 'true');
+  assert.equal(app.node('adversario-lista').getAttribute('aria-invalid'), 'true');
   assert.equal(app.node('grupo-modo').classList.contains('invalido'), true);
   assert.equal(app.node('grupo-resultado').classList.contains('invalido'), true);
 });
@@ -399,15 +402,56 @@ test('registro: sucesso informa data, limpa formulário e atualiza partidas rece
   assert.equal(form.get('adversario'), 'Bruno Reis');
   assert.equal(form.get('modo'), 'Blitz');
   assert.equal(form.get('resultado'), 'Vitória');
+  app.request('api/partidas/adversarios').respond({ adversarios: ['Ana Lima'] });
+  await settle();
+  assert.equal(app.node('adversario-lista').value, '!');
+  assert.equal(app.node('adversario').value, ' Bruno Reis ');
   request.respond({ partida: game() }, 201);
   await settle();
   app.request('api/partidas?', 1).respond(historyPage());
   await settle();
   assert.match(app.node('mensagem').textContent, /20\/10\/2026 às 22:01/);
   assert.equal(app.node('adversario').value, '');
+  assert.equal(app.node('adversario-lista').value, '');
+  assert.equal(app.node('adversario').disabled, true);
+  assert.deepEqual(app.node('adversarios-disponiveis').querySelectorAll('option').map(option => option.value),
+    ['Ana Lima', 'Bruno Reis']);
   assert.match(app.node('recentes').textContent, /Bruno Reis/);
   assert.equal(app.node('form-partida').querySelector('button[type=submit]').disabled, false);
 });
+
+test('registro: escolhe nome da lista pelo valor, em ordem alfabética e sem duplicar a grafia', async () => {
+  const app = createApp('registrar');
+  const literal = 'José <Silva>';
+  app.request('api/partidas/adversarios').respond({ adversarios: ['Zeca', literal, 'jOsÉ <sILVA>', 'Adélia'] });
+  await settle();
+  const opcoes = app.node('adversarios-disponiveis').querySelectorAll('option');
+  assert.deepEqual(opcoes.map(option => option.textContent), ['Adélia', literal, 'Zeca']);
+  assert.equal(opcoes[1].children.length, 1);
+  assert.equal(opcoes[1].value, literal);
+  validGame(app, literal);
+  app.node('form-partida').dispatch('submit');
+  const envio = app.request(call => call.url === 'api/partidas' && call.init.method === 'POST');
+  assert.equal(new URLSearchParams(envio.init.body).get('adversario'), literal);
+  assert.equal(app.node('adversario').disabled, true);
+});
+
+for (const estado of ['lista vazia', 'falha de rede']) {
+  test(`registro: permite digitar o adversário quando há ${estado}`, async () => {
+    const app = createApp('registrar');
+    const carregar = app.request('api/partidas/adversarios');
+    if (estado === 'lista vazia') carregar.respond({ adversarios: [] });
+    else carregar.reject();
+    await settle();
+    assert.equal(app.node('adversario-lista').value, '!');
+    assert.equal(app.node('adversario-manual').getAttribute('hidden'), null);
+    assert.equal(app.node('adversario').disabled, false);
+    assert.match(app.node('adversarios-aviso').textContent, /digit/i);
+    app.node('form-partida').dispatch('submit');
+    assert.equal(app.document.activeElement, app.node('adversario'));
+    assert.equal(app.requests.filter(request => request.init.method === 'POST').length, 0);
+  });
+}
 
 for (const failure of ['HTTP 500', 'rede']) {
   test(`registro: falha de ${failure} preserva dados e permite novo envio`, async () => {

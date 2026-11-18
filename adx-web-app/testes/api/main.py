@@ -182,7 +182,7 @@ class AdxHttpTests(unittest.TestCase):
         """T01 expandido: todas as rotas privadas, leitura e escrita, exigem sessao."""
         client = Client()
         routes = [("GET", "/api/me"), ("GET", "/api/painel"), ("GET", "/api/perfil"),
-                  ("GET", "/api/ranking"), ("GET", "/api/partidas"),
+                  ("GET", "/api/ranking"), ("GET", "/api/partidas"), ("GET", "/api/partidas/adversarios"),
                   ("GET", "/api/partidas/%s" % self.primary_matches[0]["id"]),
                   ("POST", "/api/partidas"), ("POST", "/api/perfil"), ("POST", "/api/logout")]
         for method, path in routes:
@@ -581,6 +581,31 @@ class AdxHttpTests(unittest.TestCase):
                 self.assertIn("frame-ancestors 'none'", response.headers.get("Content-Security-Policy", ""))
                 if path.startswith("/api/") and status != 401:
                     self.assertEqual(response.headers.get("Cache-Control"), "no-store")
+
+    def test_40_opponents_include_public_players_and_only_personal_history(self):
+        """A lista inclui novatos e todo o histórico pessoal, usando somente nomes públicos."""
+        path = "/api/partidas/adversarios"
+        display_name = "Jogador " + uuid.uuid4().hex[:10]
+        full_name = display_name + " Sobrenome"
+        newcomer, email = self.signed_account("lista-adversarios", full_name)
+
+        data = self.json_ok(self.primary, path)
+        self.assertEqual(set(data), {"adversarios"})
+        names = data["adversarios"]
+        self.assertIsInstance(names, list)
+        self.assertTrue(all(isinstance(name, str) for name in names))
+        self.assertIn(display_name, names)
+        self.assertNotIn(full_name, names)
+        self.assertNotIn(email, names)
+        self.assertNotIn(display_name, self.json_ok(newcomer, path)["adversarios"])
+        self.assertTrue({match["adversario"] for match in self.primary_matches}.issubset(names))
+        self.assertEqual([name.lower() for name in names].count("rafael moura"), 1)
+
+        private_opponent = "Visitante " + uuid.uuid4().hex[:10]
+        self.assert_status(newcomer.request("POST", "/api/partidas", {
+            "adversario": private_opponent, "modo": "Blitz", "resultado": "Empate"}), 201)
+        self.assertIn(private_opponent, self.json_ok(newcomer, path)["adversarios"])
+        self.assertNotIn(private_opponent, self.json_ok(self.primary, path)["adversarios"])
 
 
 class JsonTestResult(unittest.TextTestResult):
