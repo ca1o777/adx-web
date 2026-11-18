@@ -1,0 +1,86 @@
+/* A fotografia local também é apresentada pelo HTML antes de os estilos carregarem. */
+.acesso.login-acesso {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+}
+.login-capa {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(30px, 4.6vw, 82px);
+  background: #2c1b13;
+  color: #fff4e3;
+}
+.login-foto, .login-luz, .login-capa::after {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.login-foto {
+  object-fit: cover;
+  object-position: 63% center;
+}
+.login-capa::after {
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(180deg, #1b100857, transparent 26%, transparent 63%, #120a05e8);
+}
+.login-luz { z-index: 1; }
+.login-marca, .login-descricao { position: relative; z-index: 2; }
+.login-marca {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  align-self: flex-start;
+}
+.login-marca strong {
+  color: #fff8e9;
+  font: 700 clamp(48px, 5.8vw, 84px)/.85 var(--fonte-titulo);
+  letter-spacing: -.055em;
+}
+.login-marca span {
+  max-width: 9em;
+  border-left: 1px solid #d3aa70;
+  padding-left: 15px;
+  font: 600 16px/1.2 var(--fonte-texto);
+  color: #fae9cf;
+}
+.login-descricao {
+  max-width: 30ch;
+  font: 500 clamp(20px, 1.9vw, 31px)/1.28 var(--fonte-texto);
+  color: #fff9f0;
+  text-wrap: balance;
+}
+.login-descricao::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 2px;
+  margin-bottom: 16px;
+  background: #e7bb70;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .login-luz {
+    background: radial-gradient(circle at var(--luz-x, 62%) var(--luz-y, 51%), #ffde8b38, transparent 28%);
+    opacity: 0;
+    transition: opacity .18s ease;
+  }
+  .login-luz:hover { opacity: 1; }
+}
+@media (max-width: 760px) {
+  .acesso.login-acesso { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .login-capa {
+    min-height: clamp(150px, 24vh, 210px);
+    justify-content: center;
+    padding: 24px clamp(22px, 6vw, 46px);
+  }
+  .login-foto { object-position: 62% 52%; }
+  .login-capa::after { background: linear-gradient(90deg, #1b0d05db, #1b0d0573 42%, transparent 76%); }
+  .login-marca { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .login-marca span { max-width: none; border: 0; padding: 0; font-size: 14px; }
+  .login-descricao { display: none; }
+  .login-acesso .acesso-form { align-items: flex-start; padding: clamp(26px, 6vh, 54px) 24px; }
+}

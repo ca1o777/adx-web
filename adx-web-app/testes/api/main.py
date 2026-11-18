@@ -56,9 +56,9 @@ class Client:
         self.opener = urllib.request.build_opener(
             urllib.request.HTTPCookieProcessor(self.jar), NoRedirect())
 
-    def request(self, method, path, data=None, csrf="ADX", cookie=None):
+    def request(self, method, path, data=None, csrf="ADX", cookie=None, headers=None):
         global REQUEST_COUNT
-        headers = {}
+        headers = dict(headers or {})
         body = None
         if data is not None:
             body = urllib.parse.urlencode(data).encode("utf-8")
@@ -178,6 +178,29 @@ class AdxHttpTests(unittest.TestCase):
                 response = client.request("GET", path)
                 self.assert_status(response, 302)
                 self.assertTrue(response.headers.get("Location", "").endswith("/index.html"))
+
+    def test_static_pages_and_assets_revalidate_before_reuse(self):
+        """Uma aba com HTML, estilos ou scripts em cache consulta a versão atual da aplicação."""
+        public = Client()
+        for path in ("/", "/index.html", "/painel.html", "/assets/css/style.css", "/assets/css/painel.css",
+                     "/assets/js/app.js"):
+            with self.subTest(path=path):
+                client = self.primary if path == "/painel.html" else public
+                fresh = client.request("HEAD", path)
+                self.assert_status(fresh, 200)
+                self.assertIn("no-cache", fresh.headers.get("Cache-Control", ""))
+                etag = fresh.headers.get("ETag")
+                self.assertTrue(etag)
+
+                unchanged = client.request("GET", path, headers={"If-None-Match": etag})
+                self.assert_status(unchanged, 304)
+                self.assertIn("no-cache", unchanged.headers.get("Cache-Control", ""))
+                self.assertEqual(unchanged.text, "")
+
+                updated = client.request("GET", path, headers={"If-None-Match": '"versao-anterior"'})
+                self.assert_status(updated, 200)
+                self.assertIn("no-cache", updated.headers.get("Cache-Control", ""))
+                self.assertTrue(updated.text)
 
     def test_02_all_private_api_routes_require_authentication(self):
         """T01 expandido: todas as rotas privadas, leitura e escrita, exigem sessao."""

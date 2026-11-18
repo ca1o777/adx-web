@@ -22,6 +22,21 @@ function elements(file) {
 
 function tokens(value) { return (value || '').split(/\s+/).filter(Boolean); }
 
+test('HTML login: a capa está no HTML e a imagem e os estilos locais existem', () => {
+  const nodes = elements('index.html');
+  const photo = nodes.find(node => node.tag === 'img' && tokens(node.class).includes('login-foto'));
+  assert.ok(photo, 'A capa deve aparecer mesmo quando CSS e JavaScript estiverem desativados');
+  assert.ok(Number(photo.width) > 0 && Number(photo.height) > 0);
+  const stylesheets = nodes.filter(node => node.rel === 'stylesheet');
+  assert.ok(stylesheets.length > 0);
+  for (const resource of [photo.src, ...stylesheets.map(link => link.href)]) {
+    assert.match(resource, /^assets\//);
+    const [file, query] = resource.split('?');
+    assert.ok(new URLSearchParams(query).get('v'), 'O navegador antigo deve buscar o novo recurso');
+    assert.ok(fs.statSync(path.join(web, file)).size > 0);
+  }
+});
+
 for (const file of fs.readdirSync(web).filter(name => name.endsWith('.html')).sort()) {
   test(`HTML ${file}: IDs únicos e referências acessíveis existentes`, () => {
     const nodes = elements(file);

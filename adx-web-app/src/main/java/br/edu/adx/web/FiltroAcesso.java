@@ -34,6 +34,10 @@ public class FiltroAcesso implements Filter {
                 "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none'");
 
         String caminho = req.getServletPath();
+        if (!caminho.startsWith("/api/")) {
+            // Os arquivos do site podem mudar na mesma URL. O Tomcat valida o ETag antes de reutilizá-los.
+            resp.setHeader("Cache-Control", "private, no-cache");
+        }
         if (caminho.startsWith("/assets/")) {
             chain.doFilter(rq, rs);
             return;

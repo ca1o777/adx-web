@@ -70,7 +70,7 @@ public class Main {
         ctx.addServletMappingDecoded("/", "default");
         ctx.addWelcomeFile("index.html");
         Map.of("html", "text/html", "css", "text/css", "js", "text/javascript", "woff2", "font/woff2",
-                "png", "image/png", "svg", "image/svg+xml", "ico", "image/x-icon").forEach(ctx::addMimeMapping);
+                "png", "image/png", "jpg", "image/jpeg", "svg", "image/svg+xml", "ico", "image/x-icon").forEach(ctx::addMimeMapping);
 
         // controle de acesso (RN003)
         FilterDef def = new FilterDef();

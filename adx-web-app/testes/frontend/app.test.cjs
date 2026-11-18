@@ -199,6 +199,9 @@ test('painel: mostra resumo, aproveitamento, partidas recentes e posição', asy
   app.request('api/painel').respond({ resumo: counts(), ultimas: [game()], modos: [{ modo: 'Blitz', ...counts() }], posicao: 2, totalJogadores: 8 });
   await settle();
   assert.match(app.node('placar').textContent, /3partidas1vitórias1empates1derrotas/);
+  const valores = app.node('placar').querySelectorAll('.placar-atual');
+  assert.deepEqual(valores.map(node => node.textContent), ['3', '1', '1', '1']);
+  assert.ok(app.node('placar').querySelectorAll('.placar-anterior').every(node => node.getAttribute('aria-hidden') === 'true'));
   assert.equal(app.node('aproveitamento').textContent, '50,0%');
   assert.match(app.node('ultimas').textContent, /Bruno Reis/);
   assert.match(app.node('modos').textContent, /Blitz/);
@@ -211,6 +214,7 @@ test('painel: usuário sem partidas recebe orientação e zero por cento', async
   app.request('api/painel').respond({ resumo: counts({ total: 0, vitorias: 0, empates: 0, derrotas: 0, aproveitamento: 0 }), ultimas: [], evolucao: [], modos: [], posicao: 1, totalJogadores: 1 });
   await settle();
   assert.match(app.node('evolucao-estado').textContent, /primeira partida/);
+  assert.equal(app.node('placar').querySelectorAll('.em-transicao').length, 0);
   assert.equal(app.node('evolucao-grafico').getAttribute('hidden'), '');
   assert.match(app.node('ultimas').textContent, /Você ainda não registrou partidas/);
   assert.equal(app.node('aproveitamento').textContent, '0,0%');
@@ -225,6 +229,7 @@ test('painel: uma partida gera um ponto central e informa seu resultado', async 
   assert.equal(app.node('evolucao-linha').getAttribute('points'), '50,0');
   assert.equal(app.node('evolucao-preenchimento').getAttribute('points'), '');
   assert.equal(app.node('evolucao-valor').textContent, '100,0%');
+  assert.equal(app.node('evolucao-guia').getAttribute('x1'), '50');
   assert.equal(app.node('evolucao-partida').textContent, 'Vitória contra Ana <Silva>');
   assert.equal(app.node('evolucao-partida').querySelector('silva'), null);
 });
@@ -245,6 +250,7 @@ test('painel: pontos do mesmo dia são selecionáveis com ponteiro, clique e tec
   assert.equal(app.node('evolucao-partida').textContent, 'Empate contra Adversário 5');
   botoes[0].dispatch('click');
   assert.equal(app.node('evolucao-valor').textContent, '0,0%');
+  assert.equal(app.node('evolucao-guia').getAttribute('x2'), '0');
   botoes[0].focus();
   botoes[0].dispatch('keydown', { key: 'ArrowRight' });
   assert.equal(app.document.activeElement, botoes[1]);
@@ -336,6 +342,12 @@ test('login: requisição usa formulário codificado e sucesso abre painel', asy
   validLogin(app);
   app.node('senha').value = 'Senha & + ç';
   app.node('form-login').dispatch('submit');
+  app.node('form-login').dispatch('submit');
+  assert.equal(app.requests.filter(call => call.url === 'api/login').length, 1);
+  assert.equal(app.node('entrar-rotulo').textContent, 'Entrando…');
+  assert.equal(app.node('mensagem').getAttribute('role'), 'status');
+  assert.equal(app.node('mensagem').textContent, 'Entrando…');
+  assert.equal(app.node('form-login').querySelector('button[type=submit]').getAttribute('aria-busy'), 'true');
   const request = app.request('api/login');
   assert.equal(request.init.method, 'POST');
   assert.equal(request.init.credentials, 'same-origin');
@@ -363,6 +375,8 @@ for (const failure of ['HTTP 400', 'HTTP 429', 'HTTP 500', 'rede', 'HTML inváli
     assert.equal(app.window.location.href, app.originalHref);
     assert.match(app.node('mensagem').className, /falha/);
     assert.ok(app.node('mensagem').textContent.length > 5);
+    assert.equal(app.node('entrar-rotulo').textContent, 'Entrar');
+    assert.equal(app.node('form-login').querySelector('button[type=submit]').getAttribute('aria-busy'), null);
     assert.equal(app.node('form-login').querySelector('button[type=submit]').disabled, false);
   });
 }

@@ -268,15 +268,21 @@
     api("GET", "api/me").then(function (r) { if (r.ok) window.location.href = "painel.html"; });
     $("#form-login").addEventListener("submit", function (ev) {
       ev.preventDefault();
+      var botao = $("button[type=submit]", ev.target);
+      if (botao.disabled) return;
       var email = $("#email"), senha = $("#senha");
       var ok = marcar(email, !EMAIL_OK.test(email.value.trim()), "Informe um e-mail válido.");
       ok = marcar(senha, senha.value.length === 0, "Informe sua senha.") && ok;
       if (!ok) { anunciarValidacao(ev.target, $("#mensagem")); return; }
-      var botao = $("button[type=submit]", ev.target);
       botao.disabled = true;
+      botao.setAttribute("aria-busy", "true");
+      $("#entrar-rotulo").textContent = "Entrando…";
+      mostrarMensagem($("#mensagem"), "andamento", "Entrando…");
       api("POST", "api/login", { email: email.value.trim(), senha: senha.value }).then(function (r) {
         if (r.ok) { window.location.href = "painel.html"; return; }
         botao.disabled = false;
+        botao.removeAttribute("aria-busy");
+        $("#entrar-rotulo").textContent = "Entrar";
         mostrarMensagem($("#mensagem"), "falha", r.corpo.erro || "Não foi possível entrar.");
       });
     });
@@ -315,6 +321,22 @@
     });
   };
 
+  function mostrarPlacar(resumo) {
+    var placar = $("#placar");
+    var anteriores = placar.querySelectorAll(".placar-atual");
+    var metricas = [
+      [resumo.total, "partidas", ""], [resumo.vitorias, "vitórias", "v"],
+      [resumo.empates, "empates", "e"], [resumo.derrotas, "derrotas", "d"]
+    ];
+    placar.innerHTML = metricas.map(function (metrica, i) {
+      var valor = String(metrica[0]), anterior = anteriores[i] ? anteriores[i].textContent : "0";
+      var movimento = anterior === valor ? "" : " em-transicao";
+      return '<div class="placar-metrica ' + metrica[2] + '"><strong class="numero placar-numero' + movimento + '">' +
+        '<span class="placar-anterior" aria-hidden="true" data-anterior="' + escapar(anterior) + '"></span>' +
+        '<span class="placar-atual">' + escapar(valor) + '</span></strong><span>' + metrica[1] + '</span></div>';
+    }).join("");
+  }
+
   function mostrarEvolucao(pontos) {
     var grafico = $("#evolucao-grafico"), estado = $("#evolucao-estado");
     var periodo = $("#evolucao-periodo"), marcadores = $("#evolucao-pontos");
@@ -339,6 +361,10 @@
 
     function selecionar(indice) {
       var ponto = pontos[indice];
+      var x = ultimo ? 100 * indice / ultimo : 50;
+      var guia = $("#evolucao-guia");
+      guia.setAttribute("x1", x);
+      guia.setAttribute("x2", x);
       botoes.forEach(function (botao, i) {
         botao.setAttribute("aria-pressed", String(indice === i));
         botao.setAttribute("tabindex", indice === i ? "0" : "-1");
@@ -393,11 +419,7 @@
       }
       limparAviso("painel");
       var d = r.corpo, c = d.resumo;
-      $("#placar").innerHTML =
-        '<div><strong class="numero">' + c.total + "</strong><span>partidas</span></div>" +
-        '<div class="v"><strong class="numero">' + c.vitorias + "</strong><span>vitórias</span></div>" +
-        '<div class="e"><strong class="numero">' + c.empates + "</strong><span>empates</span></div>" +
-        '<div class="d"><strong class="numero">' + c.derrotas + "</strong><span>derrotas</span></div>";
+      mostrarPlacar(c);
       $("#barra").innerHTML = barra(c);
       $("#aproveitamento").textContent = porcentagem(c.aproveitamento);
       mostrarEvolucao(d.evolucao);
