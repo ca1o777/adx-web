@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ranking de jogadores | ADX – Aplicativo de Xadrez</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="assets/css/style.css?v=471697377ff3">
+  <link rel="stylesheet" href="assets/css/style.css?v=7d7105a47876">
+  <link rel="stylesheet" href="assets/css/ranking.css?v=fe84cc5bd028">
 </head>
 <body data-tela="ranking">
   <header class="topo">
@@ -16,19 +17,28 @@
     </div>
   </header>
   <main class="conteudo">
-    <div class="cabecalho-pagina">
-      <div><h1>Ranking de jogadores</h1><p>Classificação pelo total de vitórias. Em caso de empate, vale o maior aproveitamento.</p></div>
-    </div>
-    <section class="painel">
-      <div class="tabela-rolagem">
-        <table class="planilha">
-          <thead><tr><th class="col-pos">Posição</th><th>Jogador</th><th class="col-dir">Partidas</th><th class="col-dir">Vitórias</th><th class="col-dir">Empates</th><th class="col-dir">Derrotas</th><th class="col-dir">Aproveitamento</th></tr></thead>
-          <tbody id="tabela-ranking"></tbody>
+    <header class="ranking-capa">
+      <div class="ranking-intro">
+        <h1>Ranking de jogadores</h1>
+        <p>Classificação pelo total de vitórias. Em caso de empate, vale o maior aproveitamento.</p>
+      </div>
+      <div class="ranking-minha" id="ranking-minha" hidden>
+        <span>Sua posição</span>
+        <p><strong id="ranking-posicao"></strong><span id="ranking-participantes"></span></p>
+        <a href="#minha-classificacao">Ver minha linha <span aria-hidden="true">↓</span></a>
+      </div>
+    </header>
+    <section class="ranking-quadro" aria-label="Classificação geral">
+      <div class="tabela-rolagem ranking-rolagem" role="region" aria-label="Tabela de classificação" tabindex="0">
+        <table class="planilha ranking-tabela" aria-describedby="regra-aproveitamento">
+          <caption class="oculto-visual">Classificação por vitórias e aproveitamento</caption>
+          <thead><tr><th scope="col">Posição</th><th scope="col">Jogador</th><th scope="col" class="col-dir">Partidas</th><th scope="col" class="col-dir">Vitórias</th><th scope="col" class="col-dir">Empates</th><th scope="col" class="col-dir">Derrotas</th><th scope="col" class="col-dir">Aproveitamento</th></tr></thead>
+          <tbody id="tabela-ranking"><tr><td colspan="7" class="vazio">Carregando a classificação…</td></tr></tbody>
         </table>
       </div>
-      <p class="suave espaco-pequeno">Aproveitamento é a soma das vitórias com metade dos empates, dividida pelo total de partidas.</p>
+      <p class="ranking-nota" id="regra-aproveitamento"><strong>Aproveitamento</strong> soma as vitórias e metade dos empates e divide esse valor pelo total de partidas.</p>
     </section>
   </main>
-  <script src="assets/js/app.js?v=31564ed60cc9"></script>
+  <script src="assets/js/app.js?v=6fe2102887de"></script>
 </body>
 </html>

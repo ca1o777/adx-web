@@ -1,6 +1,6 @@
 # Referências visuais do ADX
 
-O login e o painel usam HTML, CSS e JavaScript locais. As referências abaixo identificam as ideias e os trechos adaptados no projeto.
+As telas do ADX usam HTML, CSS e JavaScript locais. As referências abaixo identificam as ideias e os trechos adaptados no projeto.
 
 ## Spell UI
 
@@ -17,6 +17,12 @@ A moldura de 24 pixels, as superfícies arredondadas e as sombras sobrepostas do
 ## Skiper UI
 
 A transição vertical dos totais segue o exemplo gratuito **Animated Number** da Skiper UI, de gxuri. A animação do ADX é uma implementação própria em CSS. O total final está disponível imediatamente aos leitores de tela e aparece sem animação quando a pessoa prefere movimento reduzido. [Animated Number](https://skiper-ui.com/v1/skiper37)
+
+## Ranking, registro e perfil
+
+No ranking, o resumo da conta leva o jogador à sua linha. A moldura da classificação retoma o Minimal Card, e a posição surge com uma transição curta inspirada no Animated Number. Cada percentual tem uma barra e o valor por escrito. [Cult UI](https://www.cult-ui.com/docs/components/minimal-card) · [Skiper UI](https://skiper-ui.com/v1/skiper37)
+
+No registro, o jogador escolhe modo e resultado em controles de seleção únicos e confirma no botão dourado inspirado no Rich Button. No perfil, o avatar e o nome ficam sobre um tabuleiro em perspectiva desenhado em CSS a partir da ideia do Chess Horizon. [Spell UI](https://spell.sh/docs/rich-button) · [OriginKit](https://www.originkit.dev/components/chess-horizon)
 
 ## Licença da adaptação do Minimal Card
 

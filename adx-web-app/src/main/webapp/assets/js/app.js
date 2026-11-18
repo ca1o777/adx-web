@@ -664,22 +664,35 @@
   telas.ranking = function carregarRanking() {
     api("GET", "api/ranking").then(function (r) {
       if (exigirLogin(r)) return;
+      var resumo = $("#ranking-minha"), tabela = $("#tabela-ranking");
       if (!r.ok) {
-        $("#tabela-ranking").innerHTML = '<tr><td colspan="7" class="vazio">Não foi possível carregar o ranking.</td></tr>';
+        resumo.setAttribute("hidden", "");
+        tabela.innerHTML = '<tr><td colspan="7" class="vazio">Não foi possível carregar o ranking.</td></tr>';
         avisoLeitura("ranking", r, "Falha ao consultar o ranking.", carregarRanking);
         return;
       }
       limparAviso("ranking");
-      $("#tabela-ranking").innerHTML = r.corpo.jogadores.map(function (j) {
-        return '<tr class="' + (j.voce ? "destaque" : "") + '">' +
-          '<td class="col-num">' + j.posicao + "º</td>" +
-          "<td><strong>" + escapar(j.nome) + "</strong>" + (j.voce ? ' <small class="suave">(você)</small>' : "") + "</td>" +
+      var jogadores = r.corpo.jogadores;
+      var propria = jogadores.find(function (j) { return j.voce; });
+      if (propria) {
+        $("#ranking-posicao").textContent = propria.posicao + "º";
+        $("#ranking-participantes").textContent = "de " + plural(jogadores.length, "jogador", "jogadores");
+        resumo.removeAttribute("hidden");
+      } else {
+        resumo.setAttribute("hidden", "");
+      }
+      tabela.innerHTML = jogadores.map(function (j) {
+        var posicaoDestacada = j.posicao <= 3 && j.vitorias > 0 ? " ranking-podio" : "";
+        return (j.voce ? '<tr id="minha-classificacao" class="destaque" tabindex="-1">' : "<tr>") +
+          '<td><span class="ranking-ordem' + posicaoDestacada + '">' + j.posicao + "º</span></td>" +
+          '<th scope="row">' + escapar(j.nome) + (j.voce ? ' <small class="ranking-voce">(você)</small>' : "") + "</th>" +
           '<td class="col-dir">' + j.total + "</td>" +
-          '<td class="col-dir">' + j.vitorias + "</td>" +
+          '<td class="col-dir ranking-vitorias">' + j.vitorias + "</td>" +
           '<td class="col-dir">' + j.empates + "</td>" +
           '<td class="col-dir">' + j.derrotas + "</td>" +
-          '<td class="col-dir">' + porcentagem(j.aproveitamento) + "</td></tr>";
-      }).join("");
+          '<td class="col-dir"><span class="ranking-percentual"><meter min="0" max="100" value="' +
+          Number(j.aproveitamento) + '" aria-hidden="true"></meter>' + porcentagem(j.aproveitamento) + "</span></td></tr>";
+      }).join("") || '<tr><td colspan="7" class="vazio">Ainda não há jogadores no ranking.</td></tr>';
     });
   };
 
@@ -847,6 +860,7 @@
     var desenharFoto = ativarFotoPerfil(function () { return usuario && usuario.iniciais; });
     function preencher(u) {
       usuario = u;
+      $("#identidade-perfil").textContent = u.nomeExibicao;
       $("#nome-exibicao").value = u.nomeExibicao;
       $("#nome-completo").value = u.nome;
       $("#modo-preferido").value = u.modoPreferido;

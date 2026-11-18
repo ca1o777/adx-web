@@ -192,6 +192,18 @@ test('ranking: mostra classificação, aproveitamento e identifica o próprio jo
   assert.match(rows[0].textContent, /1º.*Ana Bispo.*\(você\).*87,5%/);
   assert.equal(rows[0].classList.contains('destaque'), true);
   assert.equal(rows[1].classList.contains('destaque'), false);
+  assert.equal(app.node('ranking-posicao').textContent, '1º');
+  assert.equal(app.node('ranking-participantes').textContent, 'de 2 jogadores');
+  assert.equal(rows[0].getAttribute('id'), 'minha-classificacao');
+  assert.equal(rows[0].querySelector('meter').getAttribute('value'), '87.5');
+});
+
+test('ranking: ausência de resultados mantém a tabela acessível e oculta o atalho pessoal', async () => {
+  const app = createApp('ranking');
+  app.request('api/ranking').respond({ jogadores: [] });
+  await settle();
+  assert.match(app.node('tabela-ranking').textContent, /Ainda não há jogadores/);
+  assert.equal(app.node('ranking-minha').getAttribute('hidden'), '');
 });
 
 test('painel: mostra resumo, aproveitamento, partidas recentes e posição', async () => {
