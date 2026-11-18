@@ -169,10 +169,13 @@ test('acessibilidade: erro de cadastro devolvido pela API recebe foco e anúncio
   assert.match(app.node('email-erro').textContent, /já cadastrado/);
 });
 
-test('registro: não apresenta horário do navegador como data já confirmada', () => {
-  const app = createApp('registrar');
-  assert.equal(app.node('data').value, '');
-  assert.match(app.node('data').getAttribute('placeholder'), /Definida ao salvar/);
+test('registro: calendário sugere o dia de Brasília mesmo após meia-noite UTC', () => {
+  class Relogio extends Date {
+    constructor(...args) { super(...(args.length ? args : ['2026-11-19T01:30:00Z'])); }
+  }
+  const app = createApp('registrar', { Date: Relogio });
+  assert.equal(app.node('data').value, '2026-11-18');
+  assert.equal(app.node('data').getAttribute('max'), '2026-11-18');
 });
 
 test('segurança: mensagem de falha recebida da API é inserida como texto', async () => {

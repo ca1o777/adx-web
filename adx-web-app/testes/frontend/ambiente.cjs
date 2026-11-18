@@ -180,7 +180,7 @@ function createApp(screen, options = {}) {
   };
   window.alert = text => alerts.push(String(text));
   vm.runInNewContext(fs.readFileSync(path.join(WEB, 'assets/js/app.js'), 'utf8'), {
-    document, window, fetch, URL, URLSearchParams, Date, AbortController,
+    document, window, fetch, URL, URLSearchParams, Date: options.Date || Date, AbortController,
     alert: window.alert,
     setTimeout(callback, delay = 0) { const id = nextTimer++; timers.set(id, { at: now + delay, callback }); return id; },
     clearTimeout(id) { timers.delete(id); }
@@ -224,7 +224,7 @@ function createApp(screen, options = {}) {
 }
 
 function game(overrides = {}) {
-  return { id: 8, numero: 3, adversario: 'Bruno Reis', modo: 'Blitz', resultado: 'Vitória', data: '20/10/2026 às 22:00', registradaEm: '20/10/2026 às 22:01', ...overrides };
+  return { id: 8, numero: 3, adversario: 'Bruno Reis', modo: 'Blitz', resultado: 'Vitória', data: '20/10/2026', hora: '22:01', registradaEm: '20/10/2026 às 22:01', ...overrides };
 }
 function historyPage(items = [game()], overrides = {}) {
   return { pagina: 1, paginas: 1, total: items.length, de: items.length ? 1 : 0, ate: items.length, itens: items, ...overrides };

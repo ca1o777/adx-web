@@ -17,7 +17,7 @@
   </header>
   <main class="conteudo">
     <div class="cabecalho-pagina">
-      <div><h1>Registrar partida</h1><p>Informe os dados da partida que você acabou de jogar.</p></div>
+      <div><h1>Registrar partida</h1><p>Informe os dados da partida que você jogou.</p></div>
     </div>
     <div class="grade grade-form">
       <section class="painel">
@@ -58,8 +58,9 @@
           </fieldset>
           <div class="campo">
             <label for="data">Data da partida</label>
-            <input id="data" name="data" type="text" placeholder="Definida ao salvar (horário de Brasília)" aria-describedby="data-ajuda" readonly>
-            <span class="ajuda" id="data-ajuda">O servidor define a data e a hora ao salvar a partida, no horário de Brasília.</span>
+            <input id="data" name="dataPartida" type="date" required aria-describedby="data-ajuda data-erro">
+            <span class="ajuda" id="data-ajuda">O calendário começa na data de hoje em Brasília. Para registrar uma partida anterior, escolha o dia em que jogou.</span>
+            <span class="erro" id="data-erro"></span>
           </div>
           <p class="aviso">Confira os dados antes de registrar. Partidas registradas ficam no histórico e não podem ser excluídas.</p>
           <div class="acoes">

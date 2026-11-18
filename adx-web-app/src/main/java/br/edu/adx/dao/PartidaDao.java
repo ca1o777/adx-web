@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.Collator;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +25,22 @@ public class PartidaDao {
     /** Numera as partidas de cada jogador em ordem cronológica (nº da partida no histórico). */
     private static final String INTERNA = """
         (SELECT p.id, p.adversario, p.modo, p.resultado, p.data_hora,
+                COALESCE(p.data_partida, CAST(p.data_hora AS DATE)) AS data_partida,
                 ROW_NUMBER() OVER (ORDER BY p.data_hora, p.id) AS numero
            FROM partidas p WHERE p.usuario_id = ?) t""";
     private static final String SELECIONAR =
-        "SELECT id, adversario, modo, resultado, data_hora, numero FROM " + INTERNA;
+        "SELECT id, adversario, modo, resultado, data_hora, data_partida, numero FROM " + INTERNA;
     private static final String FILTRO =
         " WHERE (? = '' OR LOWER(adversario) LIKE ? ESCAPE '\\') AND (? = '' OR modo = ?) AND (? = '' OR resultado = ?)";
 
     public long inserir(long usuarioId, String adversario, String modo, String resultado, LocalDateTime dataHora) {
-        String sql = "INSERT INTO partidas (usuario_id, adversario, modo, resultado, data_hora) VALUES (?, ?, ?, ?, ?)";
+        return inserir(usuarioId, adversario, modo, resultado, dataHora, dataHora.toLocalDate());
+    }
+
+    public long inserir(long usuarioId, String adversario, String modo, String resultado,
+                        LocalDateTime dataHora, LocalDate dataPartida) {
+        String sql = "INSERT INTO partidas (usuario_id, adversario, modo, resultado, data_hora, data_partida) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection c = Banco.conexao();
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, usuarioId);
@@ -40,6 +48,7 @@ public class PartidaDao {
             ps.setString(3, modo);
             ps.setString(4, resultado);
             ps.setObject(5, dataHora);
+            ps.setObject(6, dataPartida);
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 rs.next();
@@ -194,6 +203,7 @@ public class PartidaDao {
 
     private static Partida mapear(ResultSet rs) throws SQLException {
         return new Partida(rs.getLong("id"), rs.getLong("numero"), rs.getString("adversario"),
-                rs.getString("modo"), rs.getString("resultado"), rs.getObject("data_hora", LocalDateTime.class));
+                rs.getString("modo"), rs.getString("resultado"), rs.getObject("data_hora", LocalDateTime.class),
+                rs.getObject("data_partida", LocalDate.class));
     }
 }

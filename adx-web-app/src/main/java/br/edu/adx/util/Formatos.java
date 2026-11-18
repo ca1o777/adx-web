@@ -11,7 +11,7 @@ public final class Formatos {
 
     private Formatos() { }
 
-    /** Data e hora atuais no horário de Brasília (a data da partida é sempre gerada pelo servidor). */
+    /** Data e hora atuais no horário de Brasília. */
     public static LocalDateTime agora() {
         return LocalDateTime.now(FUSO).withNano(0);
     }

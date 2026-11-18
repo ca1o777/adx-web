@@ -120,13 +120,13 @@ codigos, primeira = [], None
 for i, (adv, modo, res) in enumerate(partidas):
     dados = {"adversario": adv, "modo": modo, "resultado": res}
     if i == 0:
-        dados["data"] = "01/01/2000"      # tentativa de escolher a data: deve ser ignorada
+        dados["data"] = "01/01/2000"      # campo legado; o calendário usa dataPartida
     st, js, _, _ = A.req("POST", "/api/partidas", dados)
     codigos.append(st)
     if i == 0:
         primeira = js["partida"]
 check("T11", "RN004", "12 partidas válidas são registradas (HTTP 201)", all(c == 201 for c in codigos), f"{codigos.count(201)} de 12 com HTTP 201")
-check("T12", "RN004", "A data da partida é gerada pelo servidor; uma data enviada pelo cliente é ignorada",
+check("T12", "RN004", "Sem dataPartida, o registro usa a data de hoje em Brasília",
       primeira["data"] == hoje, f"data gravada = {primeira['registradaEm']} (hoje = {hoje})")
 
 # ---------- RN002/RN004: sem exclusão nem alteração ----------

@@ -110,7 +110,7 @@ public abstract class ApiServlet extends HttpServlet {
         m.put("adversario", p.adversario());
         m.put("modo", p.modo());
         m.put("resultado", p.resultado());
-        m.put("data", p.dataHora().format(Formatos.DATA));
+        m.put("data", p.dataPartida().format(Formatos.DATA));
         m.put("hora", p.dataHora().format(Formatos.HORA));
         m.put("registradaEm", p.dataHora().format(Formatos.DATA) + " às " + p.dataHora().format(Formatos.HORA));
         return m;

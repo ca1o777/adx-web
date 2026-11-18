@@ -1,8 +1,11 @@
 package br.edu.adx.util;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /** Regras de negócio da documentação (RN001 a RN005) que não dependem do banco de dados. */
@@ -44,7 +47,23 @@ public final class Regras {
         return erros;
     }
 
-    /** RN004: adversário, modo de jogo e resultado são obrigatórios (a data é gerada pelo servidor). */
+    /** Um pedido sem a data do calendário usa a data de hoje, como nas versões anteriores. */
+    public static Optional<LocalDate> dataPartida(String texto, LocalDate hoje) {
+        if (texto == null) {
+            return Optional.of(hoje);
+        }
+        if (texto.length() != 10) {
+            return Optional.empty();
+        }
+        try {
+            LocalDate data = LocalDate.parse(texto);
+            return data.getYear() > 0 && !data.isAfter(hoje) ? Optional.of(data) : Optional.empty();
+        } catch (DateTimeParseException e) {
+            return Optional.empty();
+        }
+    }
+
+    /** RN004: adversário, modo de jogo e resultado são obrigatórios. */
     public static Map<String, String> validarPartida(String adversario, String modo, String resultado) {
         Map<String, String> erros = new LinkedHashMap<>();
         if (adversario.length() < 2) {

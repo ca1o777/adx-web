@@ -28,6 +28,7 @@ COUNT_LOCK = threading.Lock()
 RUN_ID = uuid.uuid4().hex
 USER_KEYS = {"id", "nome", "email", "nomeExibicao", "modoPreferido", "sobre", "iniciais"}
 MATCH_KEYS = {"id", "numero", "adversario", "modo", "resultado", "data", "hora", "registradaEm"}
+BRASILIA = dt.timezone(dt.timedelta(hours=-3))
 
 
 class InfrastructureError(RuntimeError):
@@ -359,15 +360,15 @@ class AdxHttpTests(unittest.TestCase):
             self.assertEqual(set(match), MATCH_KEYS)
 
     def test_19_match_length_boundaries_and_server_date(self):
-        """T12 expandido: adversario2/60, data e IDs enviados nao controlam gravacao."""
+        """T12 expandido: sem dataPartida, vale hoje em Brasília, inclusive com campos legados."""
         client, _ = self.signed_account("partida-limites")
         for name in ("AB", "N" * 60):
-            before = dt.datetime.now(dt.timezone(dt.timedelta(hours=-3))).strftime("%d/%m/%Y")
+            before = dt.datetime.now(BRASILIA).strftime("%d/%m/%Y")
             response = client.request("POST", "/api/partidas", {"adversario": name, "modo": "Blitz",
                 "resultado": "Vitória", "data": "01/01/2000", "data_hora": "2000-01-01", "numero": 99,
                 "usuario_id": self.json_ok(self.primary, "/api/me")["usuario"]["id"]})
             match = self.assert_status(response, 201)["partida"]
-            after = dt.datetime.now(dt.timezone(dt.timedelta(hours=-3))).strftime("%d/%m/%Y")
+            after = dt.datetime.now(BRASILIA).strftime("%d/%m/%Y")
             self.assertEqual(match["adversario"], name)
             self.assertIn(match["data"], {before, after})
         for name in ("A", "N" * 61):
@@ -606,6 +607,43 @@ class AdxHttpTests(unittest.TestCase):
             "adversario": private_opponent, "modo": "Blitz", "resultado": "Empate"}), 201)
         self.assertIn(private_opponent, self.json_ok(newcomer, path)["adversarios"])
         self.assertNotIn(private_opponent, self.json_ok(self.primary, path)["adversarios"])
+
+
+    def test_41_calendar_date_persists_without_changing_registration_time_or_order(self):
+        """Um dia escolhido no calendário aparece na partida e nas consultas após o registro."""
+        client, _ = self.signed_account("calendario")
+        payload = {"adversario": "Ana Souza", "modo": "Blitz", "resultado": "Empate"}
+        today = dt.datetime.now(BRASILIA).date()
+        first = self.assert_status(client.request("POST", "/api/partidas",
+                                   {**payload, "dataPartida": today.isoformat()}), 201)["partida"]
+        self.assertEqual(first["data"], today.strftime("%d/%m/%Y"))
+
+        before = dt.datetime.now(BRASILIA).replace(second=0, microsecond=0)
+        past = self.assert_status(client.request("POST", "/api/partidas",
+                                  {**payload, "dataPartida": "2024-02-29"}), 201)["partida"]
+        after = dt.datetime.now(BRASILIA)
+        self.assertEqual(past["data"], "29/02/2024")
+        self.assertEqual((first["numero"], past["numero"]), (1, 2))
+        registered_at = dt.datetime.strptime(past["registradaEm"], "%d/%m/%Y às %H:%M").replace(tzinfo=BRASILIA)
+        self.assertLessEqual(before, registered_at)
+        self.assertLessEqual(registered_at, after)
+        self.assertEqual(past["hora"], registered_at.strftime("%H:%M"))
+        details = self.json_ok(client, "/api/partidas/%s" % past["id"])
+        self.assertEqual(details["partida"], past)
+        self.assertEqual(details["retrospecto"]["partidas"], [past, first])
+        self.assertEqual(self.json_ok(client, "/api/partidas")["itens"], [past, first])
+        self.assertEqual(self.json_ok(client, "/api/painel")["ultimas"], [past, first])
+
+    def test_42_calendar_rejects_empty_malformed_impossible_and_future_dates(self):
+        """Uma data inválida gera erro no campo e nenhuma partida é gravada."""
+        client, _ = self.signed_account("calendario-invalido")
+        future = dt.datetime.now(BRASILIA).date() + dt.timedelta(days=2)
+        for value in ("", "29/02/2024", "2024-2-9", "2023-02-29", "2024-04-31", future.isoformat()):
+            with self.subTest(data=value):
+                response = client.request("POST", "/api/partidas", {
+                    "adversario": "Ana Souza", "modo": "Blitz", "resultado": "Empate", "dataPartida": value})
+                self.assertEqual(set(self.assert_status(response, 400)["erros"]), {"dataPartida"})
+        self.assertEqual(self.json_ok(client, "/api/partidas")["total"], 0)
 
 
 class JsonTestResult(unittest.TextTestResult):

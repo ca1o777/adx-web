@@ -396,28 +396,55 @@ test('registro: sucesso informa data, limpa formulário e atualiza partidas rece
   const app = createApp('registrar');
   app.request('api/partidas?').respond(historyPage([]));
   validGame(app);
+  app.node('data').value = '2024-02-29';
   app.node('form-partida').dispatch('submit');
   const request = app.request(request => request.url === 'api/partidas' && request.init.method === 'POST');
   const form = new URLSearchParams(request.init.body);
   assert.equal(form.get('adversario'), 'Bruno Reis');
+  assert.equal(form.get('dataPartida'), '2024-02-29');
   assert.equal(form.get('modo'), 'Blitz');
   assert.equal(form.get('resultado'), 'Vitória');
   app.request('api/partidas/adversarios').respond({ adversarios: ['Ana Lima'] });
   await settle();
   assert.equal(app.node('adversario-lista').value, '!');
   assert.equal(app.node('adversario').value, ' Bruno Reis ');
-  request.respond({ partida: game() }, 201);
+  request.respond({ partida: game({ data: '29/02/2024' }) }, 201);
   await settle();
   app.request('api/partidas?', 1).respond(historyPage());
   await settle();
-  assert.match(app.node('mensagem').textContent, /20\/10\/2026 às 22:01/);
+  assert.match(app.node('mensagem').textContent, /29\/02\/2024/);
   assert.equal(app.node('adversario').value, '');
   assert.equal(app.node('adversario-lista').value, '');
+  assert.equal(app.node('data').value, app.node('data').getAttribute('max'));
   assert.equal(app.node('adversario').disabled, true);
   assert.deepEqual(app.node('adversarios-disponiveis').querySelectorAll('option').map(option => option.value),
     ['Ana Lima', 'Bruno Reis']);
   assert.match(app.node('recentes').textContent, /Bruno Reis/);
   assert.equal(app.node('form-partida').querySelector('button[type=submit]').disabled, false);
+});
+
+test('registro: calendário impede data vazia, inexistente ou futura', () => {
+  const app = createApp('registrar');
+  validGame(app);
+  for (const value of ['', '2023-02-29', '9999-01-01']) {
+    app.node('data').value = value;
+    app.node('form-partida').dispatch('submit');
+    assert.equal(app.document.activeElement, app.node('data'));
+    assert.equal(app.node('data').getAttribute('aria-invalid'), 'true');
+    assert.equal(app.requests.some(request => request.init.method === 'POST'), false);
+  }
+});
+
+test('registro: erro do servidor mantém a data escolhida para correção', async () => {
+  const app = createApp('registrar');
+  validGame(app);
+  app.node('data').value = '2024-02-29';
+  app.node('form-partida').dispatch('submit');
+  app.request(request => request.init.method === 'POST').respond({ erros: { dataPartida: 'Confira a data.' } }, 400);
+  await settle();
+  assert.equal(app.document.activeElement, app.node('data'));
+  assert.equal(app.node('data-erro').textContent, 'Confira a data.');
+  assert.equal(app.node('data').value, '2024-02-29');
 });
 
 test('registro: escolhe nome da lista pelo valor, em ordem alfabética e sem duplicar a grafia', async () => {

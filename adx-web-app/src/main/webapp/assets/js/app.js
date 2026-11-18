@@ -345,6 +345,10 @@
     var lista = $("#adversario-lista"), nomeManual = $("#adversario"), campoManual = $("#adversario-manual");
     var grupo = $("#adversarios-disponiveis"), aviso = $("#adversarios-aviso");
     var digitarNome = "!", nomes = new Map();
+    var data = $("#data");
+    var calendario = new Intl.DateTimeFormat("sv-SE", {
+      timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit"
+    });
 
     function exibirCampoManual() {
       nomeManual.disabled = lista.value !== digitarNome;
@@ -393,13 +397,25 @@
       }
     });
 
-    function atualizarData() {
-      var data = $("#data");
-      if (data) {
-        data.value = "";
-        data.setAttribute("placeholder", "Definida ao salvar (horário de Brasília)");
-      }
+    function atualizarLimiteData() {
+      var hoje = calendario.format(new Date());
+      data.setAttribute("max", hoje);
+      return hoje;
     }
+    function preencherDataAtual() {
+      data.value = atualizarLimiteData();
+      marcar(data, false);
+    }
+    function validarData() {
+      var hoje = atualizarLimiteData();
+      var instante = Date.parse(data.value);
+      if (!Number.isFinite(instante) || new Date(instante).toISOString().slice(0, 10) !== data.value ||
+          data.value < "0001-01-01") {
+        return marcar(data, true, "Selecione uma data válida para a partida.");
+      }
+      return marcar(data, data.value > hoje, "Escolha hoje ou uma data anterior.");
+    }
+    data.addEventListener("focus", atualizarLimiteData);
     function carregarRecentes() {
       api("GET", "api/partidas?porPagina=4").then(function (r) {
         if (exigirLogin(r)) return;
@@ -417,7 +433,7 @@
           : '<li><span class="suave">Nenhuma partida registrada ainda.</span></li>';
       });
     }
-    atualizarData();
+    preencherDataAtual();
     carregarRecentes();
 
     $("#form-partida").addEventListener("submit", function (ev) {
@@ -428,29 +444,31 @@
       var ok = marcar(adv, adv.value.trim().length < 2, adv === lista ? "Selecione um adversário." : "Informe o nome do adversário.");
       marcarGrupo("#grupo-modo", !modo, "Escolha o modo de jogo.");
       marcarGrupo("#grupo-resultado", !res, "Escolha o resultado da partida.");
-      if (!ok || !modo || !res) { anunciarValidacao(ev.target, $("#mensagem")); return; }
+      var dataOk = validarData();
+      if (!ok || !modo || !res || !dataOk) { anunciarValidacao(ev.target, $("#mensagem")); return; }
 
       var botao = $("button[type=submit]", ev.target);
       botao.disabled = true;
-      api("POST", "api/partidas", { adversario: adv.value.trim(), modo: modo.value, resultado: res.value })
+      api("POST", "api/partidas", { adversario: adv.value.trim(), modo: modo.value, resultado: res.value, dataPartida: data.value })
         .then(function (r) {
           botao.disabled = false;
           if (exigirLogin(r)) return;
           if (r.ok) {
             mostrarMensagem($("#mensagem"), "sucesso",
-              "Partida registrada em " + r.corpo.partida.registradaEm + ". Ela já aparece no seu histórico.");
+              "A partida de " + r.corpo.partida.data + " foi salva no seu histórico.");
             if (adv === nomeManual) {
               incluirNomes([r.corpo.partida.adversario]);
               aviso.textContent = "";
             }
             ev.target.reset();
             exibirCampoManual();
-            atualizarData();
+            preencherDataAtual();
             carregarRecentes();
             return;
           }
           var e = r.corpo.erros || {};
           if (e.adversario) marcar(adv, true, e.adversario);
+          if (e.dataPartida) marcar(data, true, e.dataPartida);
           marcarGrupo("#grupo-modo", !!e.modo, e.modo);
           marcarGrupo("#grupo-resultado", !!e.resultado, e.resultado);
           if (r.corpo.erros) anunciarValidacao(ev.target, $("#mensagem"));

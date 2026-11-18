@@ -25,7 +25,7 @@ O teste isolado ainda prepara as três contas e quinze partidas da fixture. Cada
 | Cadastro | Erros por campo, duplicidade ignorando maiúsculas, nome100/101, e-mail120/121, senha7/8/72/73, confirmação |
 | Login | Erros vazios, resposta uniforme, três falhas sequenciais, falhas concorrentes, contador zerado no sucesso |
 | Sessão | Cookie HttpOnly/SameSite/Lax/30dias, identidade, rotação no novo login, revogação do cookie antigo, logout, navegadores independentes |
-| Partidas | Doze partidas e numeração, adversário1/2/60/61, data gerada no servidor, tentativa de forjar proprietário, PUT/DELETE recusados |
+| Partidas | Doze partidas e numeração, adversário1/2/60/61, data escolhida no calendário, data padrão em Brasília e horário de registro, tentativa de forjar proprietário, PUT/DELETE recusados |
 | Histórico | Ordem, paginação10+2, limites1..50, parâmetros inválidos, página máxima int, filtros separados/combinados, vazio |
 | Busca | SQL literal; `%`, `_` e `\` sem correspondência e com correspondência literal exata |
 | Detalhes | Retrospecto4jogos, IDs inválidos e acima do long, isolamento em vários IDs nos dois sentidos |

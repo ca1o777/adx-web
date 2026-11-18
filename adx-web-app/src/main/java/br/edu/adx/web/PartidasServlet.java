@@ -96,7 +96,7 @@ public class PartidasServlet extends ApiServlet {
         json(resp, 200, corpo);
     }
 
-    /** RN004: registro com adversário, modo e resultado; a data é gerada pelo servidor. */
+    /** RN004: o jogador escolhe o dia da partida e o servidor registra o momento da inclusão. */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if (req.getPathInfo() != null && !req.getPathInfo().equals("/")) {
@@ -109,11 +109,16 @@ public class PartidasServlet extends ApiServlet {
         String resultado = p(req, "resultado");
 
         Map<String, String> erros = Regras.validarPartida(adversario, modo, resultado);
+        var registradaEm = Formatos.agora();
+        var dataPartida = Regras.dataPartida(req.getParameter("dataPartida"), registradaEm.toLocalDate());
+        if (dataPartida.isEmpty()) {
+            erros.put("dataPartida", "Escolha uma data válida até hoje.");
+        }
         if (!erros.isEmpty()) {
             erros(resp, 400, erros);
             return;
         }
-        long id = partidas.inserir(uid, adversario, modo, resultado, Formatos.agora());
+        long id = partidas.inserir(uid, adversario, modo, resultado, registradaEm, dataPartida.orElseThrow());
         json(resp, 201, Map.of("partida", mapa(partidas.buscar(uid, id).orElseThrow())));
     }
 

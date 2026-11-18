@@ -51,6 +51,7 @@ public final class Banco {
               CONSTRAINT ck_partidas_resultado CHECK (resultado IN ('Vitória', 'Empate', 'Derrota'))
             )""",
             "CREATE INDEX IF NOT EXISTS idx_partidas_usuario ON partidas (usuario_id, data_hora)",
+            "ALTER TABLE partidas ADD COLUMN IF NOT EXISTS data_partida DATE",
             "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS versao_credencial BIGINT NOT NULL DEFAULT 0",
             """
             CREATE TABLE IF NOT EXISTS codigos_conta (

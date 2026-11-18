@@ -70,6 +70,22 @@ class DaoIntegrationTest {
     }
 
     @Test
+    void partidaSemDataSeparadaUsaDataOriginalDoRegistro() throws SQLException {
+        String sql = "INSERT INTO partidas (usuario_id, adversario, modo, resultado, data_hora) VALUES (?, ?, ?, ?, ?)";
+        try (Connection c = Banco.conexao(); var ps = c.prepareStatement(sql)) {
+            ps.setLong(1, ana);
+            ps.setString(2, "Adversário anterior");
+            ps.setString(3, "Blitz");
+            ps.setString(4, "Empate");
+            ps.setObject(5, DATA);
+            ps.executeUpdate();
+        }
+        Partida partida = partidas.ultimas(ana, 1).get(0);
+        assertEquals(DATA, partida.dataHora());
+        assertEquals(DATA.toLocalDate(), partida.dataPartida());
+    }
+
+    @Test
     void cadastraConsultaEContaUsuariosSemExporHashNoPerfil() {
         assertEquals(2, usuarios.contar());
         assertTrue(usuarios.emailExiste("ana@example.com"));

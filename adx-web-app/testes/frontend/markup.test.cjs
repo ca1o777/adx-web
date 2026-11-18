@@ -43,7 +43,7 @@ for (const [file, controls] of [
   ['cadastro.html', ['nome', 'email', 'senha', 'confirmar']],
   ['perfil.html', ['nome-exibicao', 'arquivo-foto', 'novo-email', 'senha-atual', 'codigo-email']],
   ['recuperar-senha.html', ['email-recuperacao', 'codigo-recuperacao', 'senha-nova', 'confirmar-senha-nova']],
-  ['registrar-partida.html', ['adversario-lista', 'adversario']]
+  ['registrar-partida.html', ['adversario-lista', 'adversario', 'data']]
 ]) {
   test(`HTML ${file}: erros de validação estão associados aos campos`, () => {
     const nodes = elements(file);
@@ -81,11 +81,13 @@ for (const name of ['modo', 'resultado']) {
   });
 }
 
-test('HTML registro: data informa que o horário será definido ao salvar', () => {
+test('HTML registro: data da partida usa calendário nativo com rótulo e instruções', () => {
   const nodes = elements('registrar-partida.html');
   const date = nodes.find(node => node.id === 'data');
-  assert.ok(Object.hasOwn(date, 'readonly'));
-  assert.ok(!date.value, 'O HTML não deve apresentar uma data anterior ao salvamento como definitiva');
-  assert.match(date.placeholder, /salvar.*Brasília/i);
-  assert.ok(tokens(date['aria-describedby']).length, 'A data precisa incluir explicação acessível');
+  assert.equal(date.type, 'date');
+  assert.equal(date.name, 'dataPartida');
+  assert.ok(Object.hasOwn(date, 'required'));
+  assert.ok(!Object.hasOwn(date, 'readonly'));
+  assert.ok(nodes.some(node => node.tag === 'label' && node.for === 'data'));
+  assert.ok(tokens(date['aria-describedby']).includes('data-ajuda'));
 });

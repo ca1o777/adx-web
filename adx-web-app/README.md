@@ -130,7 +130,7 @@ Todas as rotas respondem JSON. Rotas que alteram dados exigem o cabeçalho `X-Re
 - **RN001** – nome e sobrenome, e-mail válido e único (maiúsculas ignoradas), senha com no mínimo 8 caracteres.
 - **RN002** – estatísticas e ranking calculados pelo servidor a partir do histórico; partidas não podem ser excluídas.
 - **RN003** – visitantes podem acessar login, cadastro e recuperação de senha. Três senhas incorretas bloqueiam o acesso por 15 minutos. A sessão permanece válida no servidor por até 30 dias de inatividade.
-- **RN004** – Ao registrar uma partida, o jogador escolhe o adversário na lista ou usa **Digitar outro nome**. A lista inclui os nomes de exibição dos demais jogadores cadastrados e os adversários do seu histórico. O jogador informa o modo e o resultado. O servidor registra a data e a hora de Brasília.
+- **RN004** – Ao registrar uma partida, o jogador escolhe o adversário na lista ou usa **Digitar outro nome**. A lista inclui os nomes de exibição dos demais jogadores cadastrados e os adversários do seu histórico. O calendário sugere o dia atual em Brasília e permite escolher uma data anterior. O jogador informa o modo e o resultado. Nos detalhes, **Data da partida** mostra o dia jogado e **Registrada em** mostra a data e a hora em que o registro foi salvo.
 - **RN005** – o jogador altera nome de exibição, modo preferido, apresentação e foto. O e-mail só muda após confirmação pelo endereço anterior. A redefinição da senha exige o código recebido no endereço cadastrado. A exclusão de conta não é oferecida na interface.
 
 ## Segurança
