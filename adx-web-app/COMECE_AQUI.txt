@@ -1,0 +1,19 @@
+COMO ABRIR O ADX NO WINDOWS
+
+1. Extraia todo o arquivo ZIP. Nao execute os arquivos de dentro do ZIP.
+2. Abra a pasta adx-web-app.
+3. De dois cliques em executar.bat.
+4. Na primeira vez, aguarde o download do Maven e das dependencias.
+5. Quando aparecer "ADX no ar", abra http://localhost:8080 no navegador.
+
+Mantenha a janela aberta enquanto usa a aplicacao. Para encerrar, use Ctrl+C.
+
+O computador precisa de JDK 17 ou superior e de internet no primeiro uso.
+O Maven vem configurado pelo Wrapper do projeto; nao precisa estar no PATH.
+
+Se estiver no PowerShell, abra-o na pasta adx-web-app e digite:
+
+    .\executar.bat
+
+Use executar-demo.bat para iniciar com jogadores ficticios num banco vazio.
+Use executar-testes.bat para rodar os testes (requer tambem Python e Node.js).
