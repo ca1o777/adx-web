@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registrar partida | ADX – Aplicativo de Xadrez</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/css/style.css?v=7d7105a47876">
+  <link rel="stylesheet" href="assets/css/registrar.css?v=62e1dc6a1b1f">
+</head>
+<body data-tela="registrar">
+  <header class="topo">
+    <div class="topo-interno">
+      <a class="marca" href="painel.html"><span class="marca-peca" aria-hidden="true">&#9822;&#xFE0E;</span>ADX</a>
+      <nav class="menu" aria-label="Menu principal"><a href="painel.html">Painel</a><a href="registrar-partida.html" aria-current="page">Registrar partida</a><a href="historico.html">Histórico</a><a href="ranking.html">Ranking</a><a href="perfil.html">Meu perfil</a></nav>
+      <div class="usuario"><span class="avatar" id="avatar" aria-hidden="true"></span><span id="nome-usuario"></span><a href="index.html" id="sair">Sair</a></div>
+    </div>
+  </header>
+  <main class="conteudo registro">
+    <div class="registro-grade">
+      <section class="painel registro-formulario" aria-labelledby="titulo-registro">
+        <header class="registro-cabecalho">
+          <h1 id="titulo-registro">Registrar partida</h1>
+          <p>O resultado entra no seu histórico e atualiza o seu desempenho.</p>
+        </header>
+        <div class="mensagem" id="mensagem" role="status" aria-live="polite" aria-atomic="true"></div>
+        <form id="form-partida" novalidate>
+          <div class="registro-confronto">
+            <div class="registro-adversario">
+              <div class="campo">
+                <label for="adversario-lista">Adversário</label>
+                <select id="adversario-lista" aria-describedby="adversarios-aviso adversario-lista-erro" required>
+                  <option value="">Selecione o adversário</option>
+                  <optgroup id="adversarios-disponiveis" label="Adversários disponíveis" hidden></optgroup>
+                  <option value="!">Digitar outro nome</option>
+                </select>
+                <span class="ajuda" id="adversarios-aviso" role="status">Carregando adversários…</span>
+                <span class="erro" id="adversario-lista-erro"></span>
+              </div>
+              <div class="campo" id="adversario-manual" hidden>
+                <label for="adversario">Nome do adversário</label>
+                <input id="adversario" name="adversario" type="text" autocomplete="off" maxlength="60" aria-describedby="adversario-erro" disabled required>
+                <span class="erro" id="adversario-erro"></span>
+              </div>
+            </div>
+            <div class="campo">
+              <label for="data">Data da partida</label>
+              <input id="data" name="dataPartida" type="date" required aria-describedby="data-ajuda data-erro">
+              <span class="ajuda" id="data-ajuda">Hoje ou uma data anterior, pelo horário de Brasília.</span>
+              <span class="erro" id="data-erro"></span>
+            </div>
+          </div>
+          <fieldset class="campo" id="grupo-modo" aria-describedby="grupo-modo-erro">
+            <legend>Modo de jogo</legend>
+            <div class="opcoes">
+              <label class="opcao"><input type="radio" name="modo" value="Clássico" aria-describedby="grupo-modo-erro" required><span>Clássico</span></label>
+              <label class="opcao"><input type="radio" name="modo" value="Rápido" aria-describedby="grupo-modo-erro" required><span>Rápido</span></label>
+              <label class="opcao"><input type="radio" name="modo" value="Blitz" aria-describedby="grupo-modo-erro" required><span>Blitz</span></label>
+            </div>
+            <span class="erro" id="grupo-modo-erro">Escolha o modo de jogo.</span>
+          </fieldset>
+          <fieldset class="campo" id="grupo-resultado" aria-describedby="grupo-resultado-erro">
+            <legend>Resultado</legend>
+            <div class="opcoes registro-resultados">
+              <label class="opcao opcao-vitoria"><input type="radio" name="resultado" value="Vitória" aria-describedby="grupo-resultado-erro" required><span><strong>Vitória</strong><small>1 ponto</small></span></label>
+              <label class="opcao opcao-empate"><input type="radio" name="resultado" value="Empate" aria-describedby="grupo-resultado-erro" required><span><strong>Empate</strong><small>½ ponto</small></span></label>
+              <label class="opcao opcao-derrota"><input type="radio" name="resultado" value="Derrota" aria-describedby="grupo-resultado-erro" required><span><strong>Derrota</strong><small>0 pontos</small></span></label>
+            </div>
+            <span class="erro" id="grupo-resultado-erro">Escolha o resultado da partida.</span>
+          </fieldset>
+          <p class="registro-aviso">Confira os dados antes de salvar. O registro é definitivo.</p>
+          <div class="acoes">
+            <button class="botao botao-primario registro-enviar" type="submit">Registrar partida</button>
+            <a class="botao botao-secundario" href="painel.html">Cancelar</a>
+          </div>
+        </form>
+      </section>
+      <aside class="painel registro-recentes" aria-labelledby="titulo-recentes">
+        <div class="registro-recentes-capa"><h2 id="titulo-recentes">Registradas recentemente</h2></div>
+        <ul class="lista-simples" id="recentes"></ul>
+        <a class="registro-historico" href="historico.html">Ver histórico completo <span aria-hidden="true">→</span></a>
+      </aside>
+    </div>
+  </main>
+  <script src="assets/js/app.js?v=6fe2102887de"></script>
+</body>
+</html>

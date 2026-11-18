@@ -1,0 +1,78 @@
+.desempenho .placar { gap: 8px; }
+.desempenho .placar .placar-metrica {
+  min-width: 0; padding: 10px clamp(8px, 1.2vw, 16px) 12px; border: 0;
+  border-radius: 9px; background: #f5f2ed;
+}
+.desempenho .placar .v { background: #edf4ec; }
+.desempenho .placar .e { background: #f9f0df; }
+.desempenho .placar .d { background: #f7eeea; }
+.desempenho .placar-numero {
+  position: relative; overflow: hidden; line-height: 1.12;
+  font-size: clamp(30px, 3.4vw, 42px);
+}
+.desempenho .placar-numero span { display: block; color: inherit; font: inherit; }
+.desempenho .placar-numero .placar-anterior { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .em-transicao .placar-atual { animation: placar-entrar .38s cubic-bezier(.22,.72,.26,1) both; }
+  .desempenho .em-transicao .placar-anterior {
+    display: block; position: absolute; inset: 0; animation: placar-sair .38s ease both;
+  }
+  .placar-anterior::before { content: attr(data-anterior); }
+}
+@keyframes placar-entrar { from { transform: translateY(85%); opacity: 0; } }
+@keyframes placar-sair { to { transform: translateY(-85%); opacity: 0; } }
+
+/* Moldura em camadas adaptada do Minimal Card da Cult UI. Ver REFERENCIAS-UI.md. */
+.painel.evolucao {
+  min-width: 0; padding: clamp(16px, 2vw, 24px); border-radius: 24px;
+  background: #faf8f4;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.7) inset, 0 1px 2px rgba(17,24,28,.08), 0 2px 4px rgba(17,24,28,.04);
+}
+.evolucao-cabecalho { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.evolucao-cabecalho span, .evolucao > .suave { color: var(--texto-suave); font-size: 14px; }
+.evolucao > .suave { margin-top: 4px; }
+#evolucao-estado, #evolucao-grafico {
+  margin-top: 18px; border-radius: 16px; color: #f8efdf;
+  background: radial-gradient(ellipse at 20% 0%, #493627 0%, transparent 65%), #29211b;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.07), 0 0 0 3px #fff, 0 0 0 4px rgba(0,0,0,.08);
+}
+#evolucao-estado { padding: 21px; }
+#evolucao-grafico { padding: 24px clamp(12px, 2vw, 22px) 14px; }
+.evolucao-quadro {
+  display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px;
+  margin: 0 0 14px; padding: 0 10px 0 0;
+}
+.evolucao-escala, .evolucao-datas { color: #e0d1bd; font-size: 13px; }
+.evolucao-escala { display: flex; flex-direction: column; justify-content: space-between; text-align: right; margin: -.5em 0; line-height: 1; }
+.evolucao-datas { grid-column: 2; display: flex; justify-content: space-between; line-height: 1.2; }
+.evolucao-datas.unica { justify-content: center; }
+.evolucao-area { height: 144px; position: relative; min-width: 0; }
+.evolucao-area svg, #evolucao-pontos { position: absolute; inset: 0; width: 100%; height: 100%; }
+.evolucao-area svg { overflow: visible; }
+.evolucao-grade { stroke: #675345; stroke-dasharray: 3 4; fill: none; vector-effect: non-scaling-stroke; }
+#evolucao-guia { stroke: #c3a475; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
+#evolucao-linha { stroke: #edc16c; stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.evolucao-ponto {
+  position: absolute; transform: translate(-50%, -50%); width: min(30px, var(--alvo)); height: 36px;
+  padding: 0; border: 0; background: transparent; border-radius: 5px; cursor: pointer; touch-action: manipulation;
+}
+.evolucao-ponto::before {
+  content: ""; display: block; width: 9px; height: 9px; box-sizing: border-box; margin: auto;
+  border-radius: 50%; background: #33271e; border: 2px solid #f1c676;
+}
+.evolucao-ponto[aria-pressed="true"] { z-index: 1; }
+.evolucao-ponto[aria-pressed="true"]::before {
+  width: 13px; height: 13px; background: #ffdc99; border-color: #33271e; box-shadow: 0 0 0 2px #f1c676;
+}
+#evolucao-detalhe {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding-top: 12px; border-top: 1px solid #665141;
+}
+#evolucao-detalhe > div { min-width: 0; overflow-wrap: anywhere; }
+#evolucao-partida, #evolucao-data { display: block; }
+#evolucao-data { color: #dac8af; font-size: 14px; }
+#evolucao-valor { color: #ffdc99; font: 700 28px/1 var(--fonte-titulo); white-space: nowrap; }
+@media (max-width: 600px) {
+  .evolucao-quadro { grid-template-columns: 31px minmax(0, 1fr); gap: 11px 8px; }
+  .evolucao-area { height: 126px; }
+}

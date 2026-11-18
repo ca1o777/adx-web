@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar | ADX – Aplicativo de Xadrez</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/css/style.css?v=7d7105a47876">
+  <link rel="stylesheet" href="assets/css/login-capa.css?v=9da99db8fc38">
+  <link rel="stylesheet" href="assets/css/login-form.css?v=e9caccbff828">
+</head>
+<body data-tela="login">
+  <main class="acesso login-acesso">
+    <section class="login-capa" aria-label="ADX — Aplicativo de Xadrez">
+      <img class="login-foto" src="assets/img/tabuleiro-adx.jpg?v=bc0220ea567e" width="300" height="300" alt="" fetchpriority="high">
+      <span class="login-luz" id="luz-tabuleiro" aria-hidden="true"></span>
+      <div class="login-marca">
+        <strong>ADX</strong>
+        <span>Aplicativo de Xadrez</span>
+      </div>
+      <p class="login-descricao">Registre suas partidas, acompanhe seu desempenho e dispute o ranking.</p>
+    </section>
+    <section class="acesso-form login-formulario" aria-labelledby="titulo-login">
+      <div class="formulario">
+        <h1 id="titulo-login">Entrar</h1>
+        <p class="subtitulo">Acesse com o e-mail e a senha cadastrados.</p>
+        <div class="mensagem" id="mensagem" role="status" aria-live="polite" aria-atomic="true"></div>
+        <form id="form-login" novalidate>
+          <div class="campo">
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="seu@email.com" aria-describedby="email-erro" required>
+            <span class="erro" id="email-erro"></span>
+          </div>
+          <div class="campo">
+            <label for="senha">Senha</label>
+            <div class="campo-senha"><input id="senha" name="senha" type="password" autocomplete="current-password" aria-describedby="senha-erro" required><button type="button" class="mostrar-senha" aria-controls="senha" aria-pressed="false">Mostrar</button></div>
+            <span class="erro" id="senha-erro"></span>
+          </div>
+          <div class="linha-link"><a href="recuperar-senha.html" id="esqueci">Esqueci minha senha</a></div>
+          <button class="botao botao-primario botao-largo login-entrar" type="submit">
+            <span id="entrar-rotulo">Entrar</span>
+            <span class="login-seta" aria-hidden="true">→</span>
+            <!-- Spinner, Spell UI (MIT). O aviso de licença acompanha login-form.css. -->
+            <svg class="login-giro" width="22" height="22" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <defs>
+                <linearGradient id="giro-inicio" x1="50%" x2="50%" y1="5.271%" y2="91.793%">
+                  <stop stop-color="currentColor"/><stop offset="1" stop-color="currentColor" stop-opacity=".55"/>
+                </linearGradient>
+                <linearGradient id="giro-fim" x1="50%" x2="50%" y1="15.24%" y2="87.15%">
+                  <stop stop-color="currentColor" stop-opacity="0"/><stop offset="1" stop-color="currentColor" stop-opacity=".55"/>
+                </linearGradient>
+              </defs>
+              <g transform="translate(1.5 1.625)">
+                <path fill="url(#giro-inicio)" d="M8.749.021a1.5 1.5 0 0 1 .497 2.958A7.5 7.5 0 0 0 3 10.375a7.5 7.5 0 0 0 7.5 7.5v3c-5.799 0-10.5-4.7-10.5-10.5C0 5.23 3.726.865 8.749.021"/>
+                <path fill="url(#giro-fim)" d="M15.392 2.673a1.5 1.5 0 0 1 2.119-.115A10.48 10.48 0 0 1 21 10.375c0 5.8-4.701 10.5-10.5 10.5v-3a7.5 7.5 0 0 0 5.007-13.084a1.5 1.5 0 0 1-.115-2.118"/>
+              </g>
+            </svg>
+          </button>
+        </form>
+        <p class="rodape-form">Ainda não tem conta? <a href="cadastro.html">Criar conta</a></p>
+      </div>
+    </section>
+  </main>
+  <script src="assets/js/app.js?v=6fe2102887de"></script>
+</body>
+</html>

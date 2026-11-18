@@ -1,0 +1,129 @@
+/* A moldura em camadas retoma o Minimal Card da Cult UI usado no painel do ADX. */
+.ranking-capa {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(22px, 3vw, 40px);
+  margin-bottom: 20px;
+  border: 1px solid #513b2d;
+  border-radius: 22px;
+  color: #fff4df;
+  background: linear-gradient(105deg, #2d211b, #3d2a1d);
+}
+.ranking-capa::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: -1;
+  width: 63%;
+  background: url("../img/tabuleiro-adx.jpg") 50% 51% / cover;
+  opacity: .8;
+  mask-image: linear-gradient(90deg, transparent, #000 35%, #000 66%, transparent);
+}
+.ranking-intro { max-width: 29rem; }
+.ranking-capa h1 {
+  color: #fff8e9;
+  font-size: clamp(34px, 4.2vw, 54px);
+  letter-spacing: -.025em;
+}
+.ranking-intro p { max-width: 24rem; margin-top: 8px; color: #f2e3d2; }
+.ranking-minha {
+  flex: none;
+  padding: 12px 18px;
+  border: 1px solid #88705b;
+  border-radius: 14px;
+  background: #33251deb;
+}
+.ranking-minha > span { font-size: 14px; font-weight: 600; color: #f1d7a7; }
+.ranking-minha p { display: flex; align-items: baseline; gap: 8px; }
+.ranking-minha strong { color: #fff9ec; font: 700 40px/1.12 var(--fonte-titulo); }
+/* Entrada baseada no Animated Number da Skiper UI; a posição já está no DOM. */
+@media (prefers-reduced-motion: no-preference) {
+  .ranking-minha:not([hidden]) strong { animation: ranking-entrar .32s cubic-bezier(.2,.7,.3,1) both; }
+}
+@keyframes ranking-entrar { from { opacity: 0; transform: translateY(.25em); } }
+.ranking-minha a {
+  display: inline-block;
+  margin-top: 2px;
+  padding-block: 2px;
+  color: #ffda8f;
+  font-size: 15px;
+  font-weight: 600;
+}
+.ranking-minha a:hover { color: #fff; }
+.ranking-minha a span { margin-left: 3px; }
+.ranking-quadro {
+  padding: 7px;
+  border: 1px solid var(--linha);
+  border-radius: 20px;
+  background: #faf8f4;
+  box-shadow: inset 0 1px 0 #fff, 0 2px 4px #32251e0d;
+}
+.ranking-rolagem {
+  border: 1px solid #e4dfd6;
+  border-radius: 14px;
+  background: white;
+}
+.ranking-rolagem:focus-visible { outline-offset: -3px; }
+.ranking-tabela { border-spacing: 0; border-collapse: separate; }
+.ranking-tabela th, .ranking-tabela td { padding: 10px clamp(9px, 1.25vw, 18px); }
+.ranking-tabela thead th {
+  color: #55483b;
+  background: #f1eade;
+  border-bottom: 1px solid #d7cbbb;
+}
+.ranking-tabela tbody th {
+  min-width: 8rem;
+  color: var(--nogueira);
+  font-size: 16px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--linha);
+}
+.ranking-tabela tbody tr:last-child > * { border-bottom: 0; }
+.ranking-tabela .vazio { padding: 25px 16px; }
+.ranking-ordem {
+  display: inline-grid;
+  min-width: 2.15rem;
+  height: 2.15rem;
+  padding-inline: 5px;
+  place-items: center;
+  border-radius: 9px;
+  color: #66594c;
+  font: 600 18px/1 var(--fonte-titulo);
+}
+.ranking-tabela tbody tr:nth-child(1) .ranking-podio { background: #f8df99; color: #644310; }
+.ranking-tabela tbody tr:nth-child(2) .ranking-podio { background: #e6e9eb; color: #414b52; }
+.ranking-tabela tbody tr:nth-child(3) .ranking-podio { background: #f3dbcb; color: #704628; }
+.ranking-tabela .ranking-vitorias { font-weight: 700; color: var(--nogueira); }
+.ranking-tabela tr.destaque, .ranking-tabela tr.destaque:hover { background: #fff4d8; }
+.ranking-tabela tr.destaque:focus { outline: 2px solid #956912; outline-offset: -2px; }
+#minha-classificacao { scroll-margin-block: 20px; }
+.ranking-voce { color: #785615; font-weight: 600; white-space: nowrap; }
+.ranking-percentual { display: inline-flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.ranking-percentual meter { appearance: none; width: 3.4rem; height: 6px; border: 0; border-radius: 4px; background: #eae4d9; }
+.ranking-percentual meter::-webkit-meter-bar { border: 0; border-radius: 4px; background: #eae4d9; height: 6px; }
+.ranking-percentual meter::-webkit-meter-optimum-value { border-radius: 4px; background: #96681c; }
+.ranking-percentual meter::-moz-meter-bar { border-radius: 4px; background: #96681c; }
+.ranking-nota { padding: 12px 12px 6px; color: var(--texto-suave); font-size: 14px; }
+.ranking-nota strong { color: var(--nogueira); font-weight: 600; }
+@media (max-width: 700px) {
+  .ranking-capa { flex-wrap: wrap; gap: 16px; }
+  .ranking-capa::before { width: 80%; opacity: .4; mask-image: linear-gradient(90deg, transparent, #000 65%); }
+  .ranking-minha { display: flex; flex: 0 1 auto; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; max-width: 100%; padding: 10px 14px; }
+  .ranking-minha > span { width: 100%; }
+  .ranking-minha strong { font-size: 28px; }
+  .ranking-tabela { min-width: 620px; }
+  .ranking-tabela th[scope="row"], .ranking-tabela thead th:nth-child(2) {
+    position: sticky;
+    left: 0;
+    box-shadow: 1px 0 0 var(--linha);
+  }
+  .ranking-tabela th[scope="row"] { max-width: 10rem; background: #fff; }
+  .ranking-tabela tr.destaque th[scope="row"] { background: #fff4d8; }
+  .ranking-percentual meter { width: 2rem; }
+}

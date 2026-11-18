@@ -1,0 +1,13 @@
+target/
+data/
+*.log
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+resultados-testes/
+__pycache__/
+*.pyc
+.ferramentas/

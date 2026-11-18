@@ -1,0 +1,125 @@
+/* O cabeçalho interpreta a perspectiva do Chess Horizon, da OriginKit, em CSS local. */
+.perfil-capa {
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
+  padding: clamp(24px, 3vw, 40px);
+  margin-bottom: 22px;
+  border: 1px solid #483021;
+  border-radius: 22px;
+  background: radial-gradient(ellipse at 94% 50%, #9b6230, transparent 51%), #38271e;
+  color: #fff7e9;
+}
+.perfil-capa::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  inset: -80% -8% -115% 43%;
+  background: repeating-conic-gradient(#e5be83 0 25%, #895527 0 50%) 0 0 / 80px 80px;
+  transform: perspective(430px) rotateX(53deg) rotateZ(-14deg);
+  opacity: .54;
+}
+.perfil-capa::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(100deg, #38271e 5%, #38271ef2 38%, #38271e70 63%, transparent);
+}
+.perfil-capa .avatar-grande {
+  width: clamp(66px, 7vw, 90px);
+  height: clamp(66px, 7vw, 90px);
+  border: 2px solid #f6ddb3;
+  box-shadow: 0 0 0 5px #d9b37e2b;
+  background: linear-gradient(145deg, #ffe7ac, #d8ae68);
+  color: #442f1a;
+  font-size: clamp(26px, 3vw, 38px);
+}
+.perfil-identidade { min-width: 0; }
+.perfil-capa h1 { color: #fff8eb; font-size: clamp(32px, 4.3vw, 48px); line-height: 1.05; }
+.perfil-capa p { margin-top: 4px; font-weight: 500; color: #f7e3c3; overflow-wrap: anywhere; }
+.perfil-capa p:empty { display: none; }
+
+.perfil-grade { grid-template-columns: minmax(0, 1.8fr) minmax(285px, 1fr); align-items: start; gap: 20px; }
+.perfil-pagina .painel {
+  min-width: 0;
+  padding: clamp(18px, 2.4vw, 30px);
+  border-color: #dfd8cf;
+  border-radius: 18px;
+  box-shadow: 0 3px 9px #53361a0a;
+}
+.perfil-pagina .painel-titulo { margin-bottom: 18px; }
+.perfil-pagina .painel h2 { font-size: 25px; }
+.perfil-pagina .foto-perfil {
+  padding: 16px;
+  margin: 0 0 23px;
+  border: 1px solid #e8dfd0;
+  border-radius: 12px;
+  background: #faf7f0;
+}
+.perfil-pagina .foto-controles { display: flex; gap: 10px 18px; align-items: center; flex-wrap: wrap; }
+.perfil-pagina .foto-controles .campo { flex: 1 1 225px; min-width: 0; margin: 0; }
+.perfil-pagina .foto-controles .acoes { margin: 0; gap: 8px; flex-wrap: wrap; }
+.perfil-pagina .foto-controles .botao { font-size: 14px; padding-inline: 12px; }
+.perfil-pagina input[type=file] {
+  min-width: 0;
+  padding: 4px 6px;
+  font-size: 14px;
+}
+.perfil-pagina input::file-selector-button {
+  margin-right: 8px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: #ece5d9;
+  color: var(--nogueira);
+  font: 600 14px var(--fonte-texto);
+  cursor: pointer;
+}
+.perfil-edicao {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 17px;
+}
+.perfil-edicao .campo { margin: 0; min-width: 0; }
+.perfil-edicao .campo-apresentacao textarea { min-height: 76px; }
+.perfil-edicao .acoes { grid-column: 1/-1; margin: 0; padding-top: 14px; border-top: 1px solid var(--linha); }
+.perfil-pagina .campo :is(input, textarea, select) { border-radius: 8px; }
+.perfil-pagina .campo input[readonly] { background: #f4f1eb; border-style: dashed; }
+.perfil-pagina .botao { border-radius: 9px; }
+.perfil-pagina .botao-secundario { background: #fffdf9; border-color: #b1a393; }
+.perfil-pagina .botao-secundario:hover { background: #f2eadb; color: var(--nogueira); border-color: var(--nogueira); }
+.perfil-pagina .botao-primario {
+  border-color: #98702d;
+  background: linear-gradient(#f4ca73, #e0a83b);
+  box-shadow: inset 0 1px #fff1c4, 0 2px 0 #77511b;
+}
+.perfil-pagina .botao-primario:hover { background: linear-gradient(#f8d99a, #e7b64c); }
+.perfil-pagina .botao-primario:active { box-shadow: inset 0 1px 2px #8e642d; }
+.perfil-conta { gap: 16px; }
+.perfil-pagina .valor-destaque { margin-top: 12px; }
+.perfil-email .detalhes-conta { border-top: 1px solid var(--linha); padding-top: 4px; }
+.perfil-email summary { width: fit-content; padding-block: 8px; }
+.perfil-conta .acoes { flex-wrap: wrap; }
+.perfil-exclusao { padding: 0 12px; }
+.perfil-exclusao h2 { font-size: 17px; }
+.perfil-exclusao p { margin-top: 3px; font-size: 14px; }
+.perfil-pagina :is(.botao, summary, input[type=file]):focus-visible { outline: 3px solid #81591e; outline-offset: 3px; }
+@media (max-width: 850px) {
+  .perfil-grade { grid-template-columns: 1fr; }
+}
+@media (max-width: 580px) {
+  .perfil-edicao { grid-template-columns: 1fr; gap: 15px; }
+  .perfil-capa { border-radius: 15px; }
+  .perfil-pagina .foto-perfil { padding: 12px; }
+  .perfil-capa::after { background: linear-gradient(90deg, #38271e, #38271ef2 52%, #38271e85); }
+}
+@media (forced-colors: active) {
+  .perfil-capa, .perfil-capa h1, .perfil-capa p { color: CanvasText; }
+}
