@@ -256,6 +256,15 @@
 
   telas.login = function () {
     ativarMostrarSenha();
+    var luz = $("#luz-tabuleiro");
+    if (luz && window.matchMedia) {
+      var ponteiro = window.matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
+      luz.addEventListener("pointermove", function (ev) {
+        if (!ponteiro.matches || ev.pointerType === "touch") return;
+        luz.style.setProperty("--luz-x", ev.offsetX + "px");
+        luz.style.setProperty("--luz-y", ev.offsetY + "px");
+      });
+    }
     api("GET", "api/me").then(function (r) { if (r.ok) window.location.href = "painel.html"; });
     $("#form-login").addEventListener("submit", function (ev) {
       ev.preventDefault();
@@ -306,6 +315,67 @@
     });
   };
 
+  function mostrarEvolucao(pontos) {
+    var grafico = $("#evolucao-grafico"), estado = $("#evolucao-estado");
+    var periodo = $("#evolucao-periodo"), marcadores = $("#evolucao-pontos");
+    marcadores.textContent = "";
+    if (!Array.isArray(pontos) || !pontos.length) {
+      grafico.setAttribute("hidden", "");
+      estado.removeAttribute("hidden");
+      estado.textContent = Array.isArray(pontos) ? "Registre sua primeira partida para ver a evolução." : "Evolução indisponível.";
+      periodo.textContent = "";
+      return;
+    }
+
+    grafico.removeAttribute("hidden");
+    estado.setAttribute("hidden", "");
+    var ultimo = pontos.length - 1;
+    periodo.textContent = ultimo ? "Últimas " + pontos.length + " partidas" : "1 partida";
+    $("#evolucao-inicio").textContent = pontos[0].data;
+    $("#evolucao-fim").textContent = ultimo ? pontos[ultimo].data : "";
+    $("#evolucao-datas").classList.toggle("unica", ultimo === 0);
+    marcadores.setAttribute("style", "--alvo:" + (100 / Math.max(1, ultimo)) + "%");
+    var coordenadas = [], botoes = [];
+
+    function selecionar(indice) {
+      var ponto = pontos[indice];
+      botoes.forEach(function (botao, i) {
+        botao.setAttribute("aria-pressed", String(indice === i));
+        botao.setAttribute("tabindex", indice === i ? "0" : "-1");
+      });
+      $("#evolucao-partida").textContent = ponto.resultado + " contra " + ponto.adversario;
+      $("#evolucao-data").textContent = ponto.data;
+      $("#evolucao-valor").textContent = porcentagem(ponto.aproveitamento);
+    }
+
+    pontos.forEach(function (ponto, i) {
+      var x = ultimo ? 100 * i / ultimo : 50;
+      var y = 100 - ponto.aproveitamento;
+      coordenadas.push(x + "," + y);
+      var botao = document.createElement("button");
+      botao.type = "button";
+      botao.className = "evolucao-ponto";
+      botao.setAttribute("style", "left:" + x + "%;top:" + y + "%");
+      botao.setAttribute("aria-label", "Ponto " + (i + 1) + " de " + pontos.length + ", " +
+        ponto.data + ", " + ponto.resultado + " contra " + ponto.adversario +
+        ", aproveitamento de " + porcentagem(ponto.aproveitamento));
+      ["pointerenter", "focus", "click"].forEach(function (evento) {
+        botao.addEventListener(evento, function () { selecionar(i); });
+      });
+      botao.addEventListener("keydown", function (evento) {
+        var destinos = { ArrowLeft: Math.max(0, i - 1), ArrowRight: Math.min(ultimo, i + 1), Home: 0, End: ultimo };
+        if (!Object.hasOwn(destinos, evento.key)) return;
+        evento.preventDefault();
+        botoes[destinos[evento.key]].focus();
+      });
+      botoes.push(botao);
+      marcadores.appendChild(botao);
+    });
+    $("#evolucao-linha").setAttribute("points", coordenadas.join(" "));
+    $("#evolucao-preenchimento").setAttribute("points", ultimo ? "0,100 " + coordenadas.join(" ") + " 100,100" : "");
+    selecionar(ultimo);
+  }
+
   telas.painel = function carregarPainel() {
     api("GET", "api/painel").then(function (r) {
       if (exigirLogin(r)) return;
@@ -314,6 +384,7 @@
         $("#placar").textContent = "Dados indisponíveis.";
         $("#barra").textContent = "";
         $("#aproveitamento").textContent = "—";
+        mostrarEvolucao();
         $("#ultimas").innerHTML = '<tr><td colspan="5" class="vazio">Não foi possível carregar as partidas recentes.</td></tr>';
         $("#modos").textContent = "Dados indisponíveis.";
         $("#posicao").textContent = "—";
@@ -329,6 +400,7 @@
         '<div class="d"><strong class="numero">' + c.derrotas + "</strong><span>derrotas</span></div>";
       $("#barra").innerHTML = barra(c);
       $("#aproveitamento").textContent = porcentagem(c.aproveitamento);
+      mostrarEvolucao(d.evolucao);
       $("#ultimas").innerHTML = d.ultimas.length
         ? d.ultimas.map(function (p) { return linhaPartida(p, false); }).join("")
         : '<tr><td colspan="5" class="vazio">Você ainda não registrou partidas. Comece por “Registrar partida”.</td></tr>';

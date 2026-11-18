@@ -208,10 +208,52 @@ test('painel: mostra resumo, aproveitamento, partidas recentes e posição', asy
 
 test('painel: usuário sem partidas recebe orientação e zero por cento', async () => {
   const app = createApp('painel');
-  app.request('api/painel').respond({ resumo: counts({ total: 0, vitorias: 0, empates: 0, derrotas: 0, aproveitamento: 0 }), ultimas: [], modos: [], posicao: 1, totalJogadores: 1 });
+  app.request('api/painel').respond({ resumo: counts({ total: 0, vitorias: 0, empates: 0, derrotas: 0, aproveitamento: 0 }), ultimas: [], evolucao: [], modos: [], posicao: 1, totalJogadores: 1 });
   await settle();
+  assert.match(app.node('evolucao-estado').textContent, /primeira partida/);
+  assert.equal(app.node('evolucao-grafico').getAttribute('hidden'), '');
   assert.match(app.node('ultimas').textContent, /Você ainda não registrou partidas/);
   assert.equal(app.node('aproveitamento').textContent, '0,0%');
+});
+
+test('painel: uma partida gera um ponto central e informa seu resultado', async () => {
+  const app = createApp('painel');
+  const partida = { data: '01/11/2026', adversario: 'Ana <Silva>', resultado: 'Vitória', aproveitamento: 100 };
+  app.request('api/painel').respond({ resumo: counts(), ultimas: [], modos: [], posicao: 1, totalJogadores: 1, evolucao: [partida] });
+  await settle();
+  assert.equal(app.node('evolucao-grafico').getAttribute('hidden'), null);
+  assert.equal(app.node('evolucao-linha').getAttribute('points'), '50,0');
+  assert.equal(app.node('evolucao-preenchimento').getAttribute('points'), '');
+  assert.equal(app.node('evolucao-valor').textContent, '100,0%');
+  assert.equal(app.node('evolucao-partida').textContent, 'Vitória contra Ana <Silva>');
+  assert.equal(app.node('evolucao-partida').querySelector('silva'), null);
+});
+
+test('painel: pontos do mesmo dia são selecionáveis com ponteiro, clique e teclado', async () => {
+  const app = createApp('painel');
+  const pontos = Array.from({ length: 10 }, (_, i) => ({
+    data: '01/11/2026', adversario: 'Adversário ' + (i + 1), resultado: i ? 'Empate' : 'Derrota', aproveitamento: i * 5
+  }));
+  app.request('api/painel').respond({ resumo: counts(), ultimas: [], modos: [], posicao: 1, totalJogadores: 1, evolucao: pontos });
+  await settle();
+  const botoes = app.node('evolucao-pontos').querySelectorAll('button');
+  assert.equal(botoes.length, 10);
+  assert.match(botoes[9].getAttribute('aria-label'), /Ponto 10 de 10/);
+  assert.equal(botoes[9].getAttribute('tabindex'), '0');
+  assert.equal(app.node('evolucao-valor').textContent, '45,0%');
+  botoes[4].dispatch('pointerenter');
+  assert.equal(app.node('evolucao-partida').textContent, 'Empate contra Adversário 5');
+  botoes[0].dispatch('click');
+  assert.equal(app.node('evolucao-valor').textContent, '0,0%');
+  botoes[0].focus();
+  botoes[0].dispatch('keydown', { key: 'ArrowRight' });
+  assert.equal(app.document.activeElement, botoes[1]);
+  assert.equal(app.node('evolucao-valor').textContent, '5,0%');
+  botoes[1].dispatch('keydown', { key: 'End' });
+  assert.equal(botoes[9].getAttribute('aria-pressed'), 'true');
+  botoes[9].dispatch('keydown', { key: 'Home' });
+  assert.equal(app.document.activeElement, botoes[0]);
+  assert.equal(botoes.filter(b => b.getAttribute('tabindex') === '0').length, 1);
 });
 
 test('detalhe: renderiza partida, retrospecto e marca a partida atual', async () => {

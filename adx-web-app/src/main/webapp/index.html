@@ -8,16 +8,21 @@
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body data-tela="login">
-  <main class="acesso">
-    <section class="acesso-tabuleiro" aria-hidden="true">
-      <div class="acesso-marca"><strong>ADX</strong><span>Aplicativo de Xadrez</span></div>
-      <div class="tabuleiro-moldura">
-        <div class="coord-linhas"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div>
-        <div class="tabuleiro"><div class="casa"><span class="peca preta">&#9820;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"><span class="peca preta">&#9821;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9819;&#xFE0E;</span></div><div class="casa"><span class="peca preta">&#9818;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9821;&#xFE0E;</span></div><div class="casa"><span class="peca preta">&#9822;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9820;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa"></div><div class="casa escura"></div><div class="casa"><span class="peca preta">&#9822;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa escura"></div><div class="casa"><span class="peca branca">&#9821;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"><span class="peca preta">&#9823;&#xFE0E;</span></div><div class="casa"></div><div class="casa escura"></div><div class="casa"></div><div class="casa"></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa"></div><div class="casa escura"></div><div class="casa"><span class="peca branca">&#9822;&#xFE0E;</span></div><div class="casa escura"></div><div class="casa"></div><div class="casa"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa"></div><div class="casa escura"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9823;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9820;&#xFE0E;</span></div><div class="casa"><span class="peca branca">&#9822;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9821;&#xFE0E;</span></div><div class="casa"><span class="peca branca">&#9819;&#xFE0E;</span></div><div class="casa escura"><span class="peca branca">&#9818;&#xFE0E;</span></div><div class="casa"></div><div class="casa escura"></div><div class="casa"><span class="peca branca">&#9820;&#xFE0E;</span></div></div>
-        <div class="coord-colunas"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+  <main class="acesso login-acesso">
+    <section class="login-capa" aria-label="ADX — Aplicativo de Xadrez">
+      <div class="login-marca">
+        <strong>ADX</strong>
+        <span>Aplicativo de Xadrez</span>
       </div>
-      <p class="lance">Abertura Ruy López: <em>1. e4 e5 2. Cf3 Cc6 3. Bb5</em></p>
-      <p class="lance">Registre suas partidas, acompanhe seu desempenho e dispute o ranking.</p>
+      <div class="login-cena" aria-hidden="true">
+        <div class="login-tabuleiro">
+          <span class="login-luz" id="luz-tabuleiro"></span>
+          <span class="login-peca login-rei-escuro"></span>
+          <span class="login-peca login-torre"></span>
+          <span class="login-peca login-rei-claro"></span>
+        </div>
+      </div>
+      <p class="login-descricao">Registre suas partidas, acompanhe seu desempenho e dispute o ranking.</p>
     </section>
     <section class="acesso-form">
       <div class="formulario">

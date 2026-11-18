@@ -65,15 +65,18 @@ class Element {
   focus() {
     let root = this;
     while (root.parentNode) root = root.parentNode;
-    root.activeElement = this;
+    if (root.activeElement !== this) {
+      root.activeElement = this;
+      this.dispatch('focus');
+    }
   }
   appendChild(child) { child.parentNode = this; this.children.push(child); return child; }
   addEventListener(type, callback) {
     if (!this.listeners.has(type)) this.listeners.set(type, []);
     this.listeners.get(type).push(callback);
   }
-  dispatch(type) {
-    const event = { type, target: this, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; }, stopPropagation() {} };
+  dispatch(type, properties = {}) {
+    const event = { ...properties, type, target: this, defaultPrevented: false, preventDefault() { this.defaultPrevented = true; }, stopPropagation() {} };
     for (const callback of this.listeners.get(type) || []) callback(event);
     return event;
   }

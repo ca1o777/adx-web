@@ -83,6 +83,8 @@ class DaoIntegrationTest {
         Partida partida = partidas.ultimas(ana, 1).get(0);
         assertEquals(DATA, partida.dataHora());
         assertEquals(DATA.toLocalDate(), partida.dataPartida());
+        assertEquals(new PartidaDao.PontoEvolucao(DATA.toLocalDate(), "Adversário anterior", "Empate", new Contagem(1, 0, 1, 0)),
+                partidas.evolucao(ana).get(0));
     }
 
     @Test
@@ -258,9 +260,25 @@ class DaoIntegrationTest {
         assertEquals(0, pagina.total());
         assertTrue(pagina.itens().isEmpty());
         assertTrue(partidas.ultimas(ana, 5).isEmpty());
+        assertTrue(partidas.evolucao(ana).isEmpty());
         assertTrue(partidas.contra(ana, "Ninguém").isEmpty());
         assertTrue(partidas.buscar(ana, Long.MAX_VALUE).isEmpty());
         assertEquals(new Contagem(0, 0, 0, 0), partidas.contagem(ana, ""));
+    }
+
+    @Test
+    void evolucaoMostraDezPontosPorDiaJogadoComAcumuladoDeTodoOHistorico() {
+        var dia = DATA.toLocalDate();
+        for (int i = 1; i <= 10; i++) {
+            partidas.inserir(ana, "Jogador " + i, "Blitz", "Empate", DATA, dia);
+        }
+        partidas.inserir(ana, "Retroativa", "Rápido", "Vitória", DATA.plusDays(1), dia.minusDays(1));
+        partidas.inserir(outro, "Outro histórico", "Blitz", "Derrota", DATA, dia);
+
+        var pontos = partidas.evolucao(ana);
+        assertEquals(10, pontos.size());
+        assertEquals(new PartidaDao.PontoEvolucao(dia, "Jogador 1", "Empate", new Contagem(2, 1, 1, 0)), pontos.get(0));
+        assertEquals(new PartidaDao.PontoEvolucao(dia, "Jogador 10", "Empate", new Contagem(11, 1, 10, 0)), pontos.get(9));
     }
 
     @Test

@@ -111,7 +111,7 @@ Todas as rotas respondem JSON. Rotas que alteram dados exigem o cabeçalho `X-Re
 | POST | `/api/login` | Entrar | UC02 · RN003 |
 | POST | `/api/logout` | Sair | UC02 |
 | GET | `/api/me` | Jogador da sessão | UC02 |
-| GET | `/api/painel` | Estatísticas, posição e últimas partidas | RN002 |
+| GET | `/api/painel` | Estatísticas, evolução do aproveitamento, posição e últimas partidas | RN002 |
 | GET | `/api/partidas?busca=&modo=&resultado=&pagina=` | Histórico com filtros | UC04 · RN002 |
 | GET | `/api/partidas/adversarios` | Listar jogadores cadastrados e adversários do próprio histórico | UC04 · RN004 |
 | POST | `/api/partidas` | Registrar partida | UC04 · RN004 |
@@ -128,7 +128,7 @@ Todas as rotas respondem JSON. Rotas que alteram dados exigem o cabeçalho `X-Re
 ## Regras de negócio implementadas
 
 - **RN001** – nome e sobrenome, e-mail válido e único (maiúsculas ignoradas), senha com no mínimo 8 caracteres.
-- **RN002** – estatísticas e ranking calculados pelo servidor a partir do histórico; partidas não podem ser excluídas.
+- **RN002** – O painel e o ranking usam os resultados do histórico. O gráfico mostra o aproveitamento acumulado após cada uma das dez partidas mais recentes, em ordem do dia jogado. Uma vitória vale um ponto e um empate vale meio ponto. Partidas registradas não podem ser excluídas.
 - **RN003** – visitantes podem acessar login, cadastro e recuperação de senha. Três senhas incorretas bloqueiam o acesso por 15 minutos. A sessão permanece válida no servidor por até 30 dias de inatividade.
 - **RN004** – Ao registrar uma partida, o jogador escolhe o adversário na lista ou usa **Digitar outro nome**. A lista inclui os nomes de exibição dos demais jogadores cadastrados e os adversários do seu histórico. O calendário sugere o dia atual em Brasília e permite escolher uma data anterior. O jogador informa o modo e o resultado. Nos detalhes, **Data da partida** mostra o dia jogado e **Registrada em** mostra a data e a hora em que o registro foi salvo.
 - **RN005** – o jogador altera nome de exibição, modo preferido, apresentação e foto. O e-mail só muda após confirmação pelo endereço anterior. A redefinição da senha exige o código recebido no endereço cadastrado. A exclusão de conta não é oferecida na interface.

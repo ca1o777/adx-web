@@ -486,6 +486,12 @@ class AdxHttpTests(unittest.TestCase):
         modes = {item["modo"]: (item["vitorias"], item["empates"], item["derrotas"]) for item in result["modos"]}
         self.assertEqual(modes, {"Clássico": (2, 1, 1), "Rápido": (1, 2, 1), "Blitz": (4, 0, 0)})
         self.assertEqual([match["numero"] for match in result["ultimas"]], [12, 11, 10, 9, 8])
+        self.assertEqual(len(result["evolucao"]), 10)
+        for point, match in zip(result["evolucao"], self.primary_matches[-10:]):
+            self.assertEqual(set(point), {"data", "adversario", "resultado", "aproveitamento"})
+            for key in ("data", "adversario", "resultado"):
+                self.assertEqual(point[key], match[key])
+        self.assertEqual(result["evolucao"][-1]["aproveitamento"], result["resumo"]["aproveitamento"])
 
     def test_32_ranking_order_self_marker_and_dashboard_position(self):
         """T20: ranking ordenado e destaque/posicao coerentes sem total global fixo."""
@@ -612,6 +618,7 @@ class AdxHttpTests(unittest.TestCase):
     def test_41_calendar_date_persists_without_changing_registration_time_or_order(self):
         """Um dia escolhido no calendário aparece na partida e nas consultas após o registro."""
         client, _ = self.signed_account("calendario")
+        self.assertEqual(self.json_ok(client, "/api/painel")["evolucao"], [])
         payload = {"adversario": "Ana Souza", "modo": "Blitz", "resultado": "Empate"}
         today = dt.datetime.now(BRASILIA).date()
         first = self.assert_status(client.request("POST", "/api/partidas",
@@ -632,7 +639,10 @@ class AdxHttpTests(unittest.TestCase):
         self.assertEqual(details["partida"], past)
         self.assertEqual(details["retrospecto"]["partidas"], [past, first])
         self.assertEqual(self.json_ok(client, "/api/partidas")["itens"], [past, first])
-        self.assertEqual(self.json_ok(client, "/api/painel")["ultimas"], [past, first])
+        panel = self.json_ok(client, "/api/painel")
+        self.assertEqual(panel["ultimas"], [past, first])
+        self.assertEqual([p["data"] for p in panel["evolucao"]], [past["data"], first["data"]])
+        self.assertEqual([p["aproveitamento"] for p in panel["evolucao"]], [50.0, 50.0])
 
     def test_42_calendar_rejects_empty_malformed_impossible_and_future_dates(self):
         """Uma data inválida gera erro no campo e nenhuma partida é gravada."""

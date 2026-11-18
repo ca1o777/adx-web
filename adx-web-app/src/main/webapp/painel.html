@@ -6,6 +6,7 @@
   <title>Painel | ADX – Aplicativo de Xadrez</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/painel.css">
 </head>
 <body data-tela="painel">
   <header class="topo">
@@ -35,15 +36,46 @@
       </section>
     </div>
     <div class="grade grade-2-1 espaco-topo">
-      <section class="painel">
-        <div class="painel-titulo"><h2>Últimas partidas</h2><a href="historico.html">Ver histórico completo</a></div>
-        <div class="tabela-rolagem"><table class="planilha"><thead><tr><th>Data</th><th>Adversário</th><th>Modo</th><th>Resultado</th><th class="col-acao"><span class="oculto-visual">Ações</span></th></tr></thead><tbody id="ultimas"></tbody></table></div>
+      <section class="painel evolucao" aria-labelledby="evolucao-titulo">
+        <div class="evolucao-cabecalho">
+          <h2 id="evolucao-titulo">Evolução do aproveitamento</h2>
+          <span id="evolucao-periodo"></span>
+        </div>
+        <p class="suave">Selecione um ponto para ver o aproveitamento acumulado após a partida.</p>
+        <p id="evolucao-estado" role="status">Carregando partidas…</p>
+        <div id="evolucao-grafico" hidden>
+          <div class="evolucao-quadro">
+            <div class="evolucao-escala numero" aria-hidden="true"><span>100%</span><span>50%</span><span>0%</span></div>
+            <div class="evolucao-area">
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <defs><linearGradient id="evolucao-ouro" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+                  <stop offset="0%" stop-color="#c18a24" stop-opacity=".23"></stop>
+                  <stop offset="100%" stop-color="#c18a24" stop-opacity=".03"></stop>
+                </linearGradient></defs>
+                <path d="M0 0H100 M0 50H100 M0 100H100" class="evolucao-grade"></path>
+                <polygon id="evolucao-preenchimento" fill="url(#evolucao-ouro)"></polygon>
+                <polyline id="evolucao-linha" fill="none"></polyline>
+              </svg>
+              <div id="evolucao-pontos" role="group" aria-label="Partidas no gráfico" aria-describedby="evolucao-teclado"></div>
+            </div>
+            <div class="evolucao-datas numero" id="evolucao-datas" aria-hidden="true"><span id="evolucao-inicio"></span><span id="evolucao-fim"></span></div>
+          </div>
+          <p class="oculto-visual" id="evolucao-teclado">Use as setas para consultar os pontos. Home vai ao primeiro e End ao último.</p>
+          <div id="evolucao-detalhe">
+            <div><strong id="evolucao-partida"></strong><span class="numero" id="evolucao-data"></span></div>
+            <strong class="numero" id="evolucao-valor"></strong>
+          </div>
+        </div>
       </section>
       <section class="painel">
         <div class="painel-titulo"><h2>Por modo de jogo</h2></div>
         <div class="modos" id="modos"></div>
       </section>
     </div>
+    <section class="painel espaco-topo">
+      <div class="painel-titulo"><h2>Últimas partidas</h2><a href="historico.html">Ver histórico completo</a></div>
+      <div class="tabela-rolagem"><table class="planilha"><thead><tr><th>Data</th><th>Adversário</th><th>Modo</th><th>Resultado</th><th class="col-acao"><span class="oculto-visual">Ações</span></th></tr></thead><tbody id="ultimas"></tbody></table></div>
+    </section>
   </main>
   <script src="assets/js/app.js"></script>
 </body>

@@ -11,6 +11,7 @@ import java.text.Collator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import java.util.Optional;
  */
 public class PartidaDao {
     public record Pagina(int total, List<Partida> itens) { }
+    public record PontoEvolucao(LocalDate data, String adversario, String resultado, Contagem acumulada) { }
 
     /** Numera as partidas de cada jogador em ordem cronológica (nº da partida no histórico). */
     private static final String INTERNA = """
@@ -153,6 +155,38 @@ public class PartidaDao {
             ps.setLong(1, usuarioId);
             ps.setInt(2, quantidade);
             return ler(ps);
+        } catch (SQLException e) {
+            throw new ErroBanco(e);
+        }
+    }
+
+    /** Últimos dez pontos por dia jogado, com aproveitamento acumulado desde a primeira partida. */
+    public List<PontoEvolucao> evolucao(long usuarioId) {
+        String sql = """
+            WITH jogos AS (
+                SELECT id, adversario, resultado, data_hora, COALESCE(data_partida, CAST(data_hora AS DATE)) AS dia
+                FROM partidas WHERE usuario_id = ?
+            )
+            SELECT dia, adversario, resultado, COUNT(*) OVER serie AS total,
+                   COUNT(*) FILTER (WHERE resultado = 'Vitória') OVER serie AS vitorias,
+                   COUNT(*) FILTER (WHERE resultado = 'Empate') OVER serie AS empates
+            FROM jogos
+            WINDOW serie AS (ORDER BY dia, data_hora, id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+            ORDER BY dia DESC, data_hora DESC, id DESC LIMIT 10
+            """;
+        try (Connection c = Banco.conexao(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, usuarioId);
+            List<PontoEvolucao> pontos = new ArrayList<>();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int total = rs.getInt("total"), vitorias = rs.getInt("vitorias"), empates = rs.getInt("empates");
+                    Contagem acumulada = new Contagem(total, vitorias, empates, total - vitorias - empates);
+                    pontos.add(new PontoEvolucao(rs.getObject("dia", LocalDate.class), rs.getString("adversario"),
+                            rs.getString("resultado"), acumulada));
+                }
+            }
+            Collections.reverse(pontos);
+            return pontos;
         } catch (SQLException e) {
             throw new ErroBanco(e);
         }

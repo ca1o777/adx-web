@@ -65,7 +65,7 @@ test('histórico: filtro imediato cancela a busca ainda agendada', async () => {
 
 for (const [screen, endpoint, key, body] of [
   ['ranking', 'api/ranking', 'ranking', { jogadores: [] }],
-  ['painel', 'api/painel', 'painel', { resumo: counts(), ultimas: [], modos: [], posicao: 1, totalJogadores: 1 }],
+  ['painel', 'api/painel', 'painel', { resumo: counts(), ultimas: [], evolucao: [], modos: [], posicao: 1, totalJogadores: 1 }],
   ['registrar', 'api/partidas?', 'recentes', historyPage([])],
   ['perfil', 'api/perfil', 'perfil', { usuario: user() }],
   ['partida', 'api/partidas/', 'partida', { partida: game(), totalPartidas: 1, retrospecto: { resumo: counts(), partidas: [game()] } }]
